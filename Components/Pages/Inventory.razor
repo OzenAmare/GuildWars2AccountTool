@@ -1,0 +1,15 @@
+@page "/Inventory"
+@using Items
+
+<PageTitle>Inventory</PageTitle>
+
+<h1>This will be a players items, bank, etc</h1>
+
+@code{
+
+    //all the items in their bank
+    List<Item> bank_items = new List<Item>();
+    
+    //eventually the string/key should be a "character" object, but for now just the name via string
+    Dictionary<string, List<Item>> character_inventories = new Dictionary<string, List<Item>>();
+}
