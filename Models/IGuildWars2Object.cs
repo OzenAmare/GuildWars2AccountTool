@@ -7,7 +7,7 @@ namespace GuildWars2Object.Models
     {
         //we'll need to use this for the different things in GW2 
 
-        public async Task GetSingleObjectData(int id) { }
+        public async Task GetObjectData(int id) { }
 
         
     }
