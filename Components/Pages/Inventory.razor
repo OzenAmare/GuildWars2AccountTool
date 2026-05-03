@@ -9,7 +9,7 @@
 
 @code{
 
-private Item? test_item; 
+private ItemResponse? test_item_response; 
     //all the items in their bank
     List<Item> bank_items = new List<Item>();
     
@@ -21,7 +21,8 @@ private Item? test_item;
     {
         // I wish I had twilight.....;w;
         
-        test_item = await ItemService.GetItemAsync(id: 30704);
+        test_item_response = await ItemService.GetItemAsync(22);
+        //test_item = await ItemService.GetItemAsync(id: 30704);
         // link to the object https://api.guildwars2.com/v2/items/30704
         //this should initialize the player's items across their account
         //need to get those API endpoints 
