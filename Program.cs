@@ -1,11 +1,15 @@
 using GuildWars2AccountTool.Components;
+using ApiServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
+builder.Services.AddHttpClient<ItemService>(client => 
+{
+    client.BaseAddress = new Uri("https://example.com");
+});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

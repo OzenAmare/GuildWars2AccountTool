@@ -1,5 +1,7 @@
 @page "/Inventory"
+@using ApiServices
 @using Items
+@inject ItemService ItemService;
 
 <PageTitle>Inventory</PageTitle>
 
@@ -7,6 +9,7 @@
 
 @code{
 
+private Item? test_item; 
     //all the items in their bank
     List<Item> bank_items = new List<Item>();
     
@@ -17,8 +20,8 @@
      protected override async Task OnInitializedAsync()
     {
         // I wish I had twilight.....;w;
-        Item twilight = new Item();
-        await twilight.GetObjectData(id: 30704);
+        
+        test_item = await ItemService.GetItemAsync(id: 30704);
         // link to the object https://api.guildwars2.com/v2/items/30704
         //this should initialize the player's items across their account
         //need to get those API endpoints 
