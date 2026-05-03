@@ -6,16 +6,36 @@
 
 <PageTitle>Inventory</PageTitle>
 
-<h1>This will be a players items, bank, etc</h1>
+<h3>Items</h3>
+<h3>Item Details</h3>
 
-<div class="card">
-    Text
-   @page_item?.Name
-</div>
+@if (page_item == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <h4>@page_item.Name</h4>
+    <p>@page_item.Description</p>
+
+    <h5>Stats</h5>
+    <ul>
+        <li>Type: @page_item.Details.Type</li>
+        <li>Damage: @page_item.Details.MinPower - @page_item.Details.MaxPower</li>
+        <li>Defense: @page_item.Details.Defense</li>
+    </ul>
+
+    <h5>Infusion Slots</h5>
+    <ul>
+        @foreach (var slot in page_item.Details.InfusionSlots)
+        {
+            <li>@string.Join(", ", slot.Flags)</li>
+        }
+    </ul>
+}
 @code{
 //@Item.Name
-    private ItemResponse? page_item; 
-    private string dogs;
+    private ItemResponse? page_item;
     //all the items in their bank
     private List<ItemResponse> bank_items = new List<ItemResponse>();
     
