@@ -19,6 +19,10 @@ namespace Items
 
         public string item_name => _item_name;
 
+        private List<string> _description { get; set; }
+
+        public List<string> description => _description;
+
         private string _item_type { get; set; }
 
         public string item_type => _item_type;
@@ -80,6 +84,30 @@ namespace Items
             private int _max_power { get; set; }
 
             public int max_power => _max_power; 
+
+            private int _defense { get; set; }
+
+            public int defense => _defense;
+
+            private List<object> _infusion_slots { get; set; }
+
+            public List<object> infusion_slots => _infusion_slots;
+
+            private decimal _attribute_adjustment { get; set; }
+
+            public decimal attribute_adjustment => _attribute_adjustment;
+
+            private int _suffix_item_id { get; set; }
+
+            public int suffix_item_id => _suffix_item_id;
+
+            private List<int> _status_choices { get; set; }
+
+            public List<int> status_choices => _status_choices;
+
+            private int _secondary_suffix_item_id { get; set; }
+
+            public int secondary_suffix_item_id => _secondary_suffix_item_id;
         }
     }
     
