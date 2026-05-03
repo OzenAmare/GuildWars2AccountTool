@@ -30,8 +30,9 @@ namespace ApiServices
 
             public async Task<ItemResponse?> GetItemAsync(int id)
             {
-                // One-liner to fetch and deserialize into your records
+
                 return await _http.GetFromJsonAsync<ItemResponse>($"{_endpoints.Items}{id}", _options);
+
             }
     }
     

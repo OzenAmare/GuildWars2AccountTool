@@ -1,27 +1,34 @@
 @page "/Inventory"
 @using ApiServices
 @using Items
+@using System.Text.Json
 @inject ItemService ItemService;
 
 <PageTitle>Inventory</PageTitle>
 
 <h1>This will be a players items, bank, etc</h1>
 
+<div class="card">
+    Text
+   @page_item?.Name
+</div>
 @code{
-
-private ItemResponse? item; 
+//@Item.Name
+    private ItemResponse? page_item; 
+    private string dogs;
     //all the items in their bank
-    List<ItemResponse> bank_items = new List<ItemResponse>();
+    private List<ItemResponse> bank_items = new List<ItemResponse>();
     
     //eventually the string/key should be a "character" object
     //for now we'll just use the name via string until we make that
-    Dictionary<string, List<ItemResponse>> character_inventories = new Dictionary<string, List<ItemResponse>>();
+    private Dictionary<string, List<ItemResponse>> character_inventories = new Dictionary<string, List<ItemResponse>>();
 
      protected override async Task OnInitializedAsync()
     {
         // I wish I had twilight.....;w;
         
-        item = await ItemService.GetItemAsync(id:30704);
+        page_item = await ItemService.GetItemAsync(id:30704);
+
         //test_item = await ItemService.GetItemAsync(id: 30704);
         // link to the object https://api.guildwars2.com/v2/items/30704
         //this should initialize the player's items across their account
