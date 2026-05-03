@@ -1,15 +1,20 @@
 using GuildWars2AccountTool.Components;
 using ApiServices;
+using ApiEndpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddHttpClient<ItemService>(client => 
+builder.Services.Configure<ArenaNetApi>(
+    builder.Configuration.GetSection("ArenaNetApi"));
+builder.Services.AddHttpClient<ItemService>(client =>
 {
-    client.BaseAddress = new Uri("https://example.com");
+    client.BaseAddress = new Uri("https://api.guildwars2.com/v2/");
 });
+
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -9,19 +9,19 @@
 
 @code{
 
-private ItemResponse? test_item_response; 
+private ItemResponse? item; 
     //all the items in their bank
-    List<Item> bank_items = new List<Item>();
+    List<ItemResponse> bank_items = new List<ItemResponse>();
     
     //eventually the string/key should be a "character" object
     //for now we'll just use the name via string until we make that
-    Dictionary<string, List<Item>> character_inventories = new Dictionary<string, List<Item>>();
+    Dictionary<string, List<ItemResponse>> character_inventories = new Dictionary<string, List<ItemResponse>>();
 
      protected override async Task OnInitializedAsync()
     {
         // I wish I had twilight.....;w;
         
-        test_item_response = await ItemService.GetItemAsync(22);
+        item = await ItemService.GetItemAsync(id:30704);
         //test_item = await ItemService.GetItemAsync(id: 30704);
         // link to the object https://api.guildwars2.com/v2/items/30704
         //this should initialize the player's items across their account
