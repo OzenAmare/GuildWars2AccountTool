@@ -10,6 +10,9 @@ namespace ApiServices
 
             private readonly HttpClient _http;
             private readonly JsonSerializerOptions _options;
+            private  string bananas; 
+            
+          
 
             private readonly ArenaNetApi _endpoints;
 
@@ -30,7 +33,7 @@ namespace ApiServices
 
             public async Task<ItemResponse?> GetItemAsync(int id)
             {
-
+                bananas = "test variable for trying jetbrains rider";
                 return await _http.GetFromJsonAsync<ItemResponse>($"{_endpoints.Items}{id}", _options);
 
             }
