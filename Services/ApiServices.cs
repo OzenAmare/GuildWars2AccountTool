@@ -12,7 +12,7 @@ namespace ApiServices
             private readonly JsonSerializerOptions _options;
             private  string bananas;
             //publishing dev branch
-            
+            private string dogs; 
           
 
             private readonly ArenaNetApi _endpoints;
