@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "N3cXMdGMok0=",
+  "dgSpecHash": "/VZnWZweABA=",
   "success": true,
-  "projectFilePath": "/home/oamare/code/dotnettauritest/src/Dotnettauritest.csproj",
+  "projectFilePath": "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
   "expectedPackageFiles": [
     "/home/oamare/.nuget/packages/microsoft.aspnetcore.authorization/8.0.19/microsoft.aspnetcore.authorization.8.0.19.nupkg.sha512",
     "/home/oamare/.nuget/packages/microsoft.aspnetcore.components/8.0.19/microsoft.aspnetcore.components.8.0.19.nupkg.sha512",

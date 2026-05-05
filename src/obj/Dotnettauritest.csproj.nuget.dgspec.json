@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/oamare/code/dotnettauritest/src/Dotnettauritest.csproj": {}
+    "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj": {}
   },
   "projects": {
-    "/home/oamare/code/dotnettauritest/src/Dotnettauritest.csproj": {
+    "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/oamare/code/dotnettauritest/src/Dotnettauritest.csproj",
+        "projectUniqueName": "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
         "projectName": "Dotnettauritest",
-        "projectPath": "/home/oamare/code/dotnettauritest/src/Dotnettauritest.csproj",
+        "projectPath": "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
         "packagesPath": "/home/oamare/.nuget/packages/",
-        "outputPath": "/home/oamare/code/dotnettauritest/src/obj/",
+        "outputPath": "/home/oamare/code/GuildWars2AccountTool/src/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/oamare/.nuget/NuGet/NuGet.Config"
