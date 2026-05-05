@@ -29,6 +29,10 @@
 
     private async Task GreetAsync()
     {
-        GreetMsg = await JsRuntime.InvokeAsync<string>("__TAURI__.core.invoke", "greet", new { name = GreetInput });
+        GreetMsg = await JsRuntime.InvokeAsync<string>(
+            "__TAURI__.core.invoke",
+            "greet",
+            new { name = GreetInput ?? ""}
+        );
     }
 }

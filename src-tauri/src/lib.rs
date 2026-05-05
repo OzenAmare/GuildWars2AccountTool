@@ -1,7 +1,28 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+use serde::Deserialize;
+
+#[derive(Deserialize)]
+struct Gw2Item{
+    name: String,
+}
+
+
+
 #[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
+async fn greet(name: String) -> Result<String, String> {
+    let id = 30704; 
+    let url = format!("https://api.guildwars2.com/v2/items/{}", id);
+
+    let item: Gw2Item = reqwest::get(url)
+        .await
+        .map_err(|e| e.to_string())?
+        .json::<Gw2Item>()
+        .await
+        .map_err(|e| e.to_string())?;
+    
+        
+        Ok(format!("Hello {}, item is {}", name, item.name))
+
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
