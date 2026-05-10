@@ -1,6 +1,8 @@
 name: 'test-on-pr'
 
-on: [pull_request]
+on: 
+  push:
+    branches: [our_first_branch]
 
 # This workflow will build your tauri app without uploading it anywhere.
 
