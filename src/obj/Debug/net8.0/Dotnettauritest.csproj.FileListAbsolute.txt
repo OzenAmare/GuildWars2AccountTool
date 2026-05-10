@@ -3096,9 +3096,6 @@ C:/Software_Personal/GW2_API_project/src/obj/Debug/net8.0/compressed/38rlone8pd-
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/3i2kt7c7pr-{0}-tptq2av103-tptq2av103.gz
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/bceqzmiczm-{0}-lfu7j35m59-lfu7j35m59.gz
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/hutttgxtci-{0}-oyz0vx2fzb-oyz0vx2fzb.gz
-/home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/i34pyexkj8-{0}-h8q3u3fsqu-h8q3u3fsqu.gz
-/home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/x1naq7hdqx-{0}-r1e2nszonz-r1e2nszonz.gz
-/home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/38rlone8pd-{0}-21tfgf46vs-21tfgf46vs.gz
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/staticwebassets.build.json
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/staticwebassets.build.json.cache
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/staticwebassets.development.json
@@ -3109,3 +3106,6 @@ C:/Software_Personal/GW2_API_project/src/obj/Debug/net8.0/compressed/38rlone8pd-
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/refint/Dotnettauritest.dll
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/Dotnettauritest.pdb
 /home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/ref/Dotnettauritest.dll
+/home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/i34pyexkj8-{0}-xlv24hoqgs-xlv24hoqgs.gz
+/home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/x1naq7hdqx-{0}-kvk384s2l7-kvk384s2l7.gz
+/home/oamare/code/GuildWars2AccountTool/src/obj/Debug/net8.0/compressed/38rlone8pd-{0}-vd9g0yk12r-vd9g0yk12r.gz
