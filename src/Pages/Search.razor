@@ -28,6 +28,7 @@
                placeholder="Enter search value..." />
 
         <button class="main-button" @onclick="SearchAsync">Search</button>
+        <button class="main-button" @onclick="RunOauthServer">Run Oauth Server </button>
     </div>
 
     <p class="result">@ResultMsg</p>
@@ -59,6 +60,19 @@
         {
             ResultMsg = "ERROR: " + ex.Message;
         }
+    }
+    private async Task RunOauthServer(){
+        try{
+            ResultMsg = await JsRuntime.InvokeAsync<String>(
+                "__TAURI__.core.invoke",
+                "oauth_login"
+            );
+        }
+        catch (Exception ex)
+        {
+            ResultMsg = "ERROR: " + ex.Message;
+        }
+        
     }
 
     private void GoHome()
