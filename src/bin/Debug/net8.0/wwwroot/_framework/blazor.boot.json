@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Dotnettauritest",
   "resources": {
-    "hash": "sha256-w8E/ZbC8+fbCXtEBufT3mtVRFqtOIwn2MV4vESgODBo=",
+    "hash": "sha256-4COHg+G54f8wrX7vy8poM47eCoec9KoLDIEzwlSZoAc=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-nElGk+CZFyq0PbPm4JU8avD6lER7x9Z1C54BK7qY12Q="
     },
@@ -209,10 +209,10 @@
       "mscorlib.wasm": "sha256-UzRTTeY8BezBltrUF59UgvVNxbmnZS3LeowarsPY8+Y=",
       "netstandard.wasm": "sha256-xHQSNwqHm8E9DM86qW7CTJoRXXsQuGmPeNipDwQFNr8=",
       "System.Private.CoreLib.wasm": "sha256-N9/Djwpe2mX4HdyhCGu9jrxG/DSYKoTPbtsIOv6VFDk=",
-      "Dotnettauritest.wasm": "sha256-R2sgvU66AgIKPJaexjR2LlclEzuMq7mKlqk4TXE1vMI="
+      "Dotnettauritest.wasm": "sha256-2TzAnJ9SihgUTykKcvaVR6yGjWSp/xs7sRwvGbCTRuE="
     },
     "pdb": {
-      "Dotnettauritest.pdb": "sha256-KsyNkQxNRXJp+EYZAevR9JMCfvHDeum3guzqb0LUbBM="
+      "Dotnettauritest.pdb": "sha256-DcsJn8EqVc68L78tBj3v7Bj8qwCujjoRW5zPbVDUivA="
     }
   },
   "cacheBootResources": true,

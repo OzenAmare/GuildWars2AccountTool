@@ -1,0 +1,92 @@
+@page "/search"
+@inject IJSRuntime JsRuntime
+@inject NavigationManager Navigation
+
+<main class="container">
+    <h1>GW2 Search</h1>
+
+    <div class="search-box">
+    <div class="custom-dropdown">
+        <button class="dropdown-button" @onclick="ToggleDropdown" type="button">
+            @GetSearchTypeLabel()
+            <span>▾</span>
+        </button>
+
+        @if (DropdownOpen)
+        {
+            <div class="dropdown-menu">
+                <button type="button" @onclick='() => SelectSearchType("item_id")'>Item ID</button>
+                <button type="button" @onclick='() => SelectSearchType("item_name")'>Item Name</button>
+                <button type="button" @onclick='() => SelectSearchType("character")'>Character</button>
+            </div>
+        }
+        <p> <br> </p>
+    </div>
+
+        <input class="search-control"
+               @bind="SearchValue"
+               placeholder="Enter search value..." />
+
+        <button class="main-button" @onclick="SearchAsync">Search</button>
+    </div>
+
+    <p class="result">@ResultMsg</p>
+
+    <button class="main-button" @onclick="GoHome">Back to Home</button>
+</main>
+
+@code
+{
+
+    private string? SearchType { get; set; } = "item_id";
+    private string? SearchValue { get; set; }
+    private string? ResultMsg { get; set; }
+
+    private async Task SearchAsync()
+    { 
+        try
+        {
+            ResultMsg = await JsRuntime.InvokeAsync<string>(
+                "__TAURI__.core.invoke",
+                "search_gw2",
+                new {
+                    searchType = SearchType ?? "",
+                    searchValue = SearchValue ?? ""
+                }
+            );
+        }
+        catch (Exception ex)
+        {
+            ResultMsg = "ERROR: " + ex.Message;
+        }
+    }
+
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private bool DropdownOpen { get; set; }
+
+    private void ToggleDropdown()
+    {
+        DropdownOpen = !DropdownOpen;
+    }
+
+    private void SelectSearchType(string value)
+    {
+        SearchType = value;
+        DropdownOpen = false;
+    }
+
+    private string GetSearchTypeLabel()
+    {
+        return SearchType switch
+        {
+            "item_id" => "Item ID",
+            "item_name" => "Item Name",
+            "character" => "Character",
+            _ => "Item ID"
+        };
+    }
+}

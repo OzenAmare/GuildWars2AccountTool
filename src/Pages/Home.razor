@@ -1,5 +1,5 @@
 ﻿@page "/"
-@inject IJSRuntime JsRuntime
+@inject NavigationManager Navigation
 
 <main class="container">
     <h1>Welcome to Tauri + Blazor</h1>
@@ -12,27 +12,19 @@
             <img src="img/blazor.svg" class="logo blazor" alt="Blazor logo"/>
         </a>
     </div>
-    <p>Click on the Tauri and Blazor logos to learn more.</p>
 
-    <form class="row" @onsubmit="GreetAsync" @onsubmit:preventDefault="true">
-        <input id="greet-input" placeholder="Enter a name..." @bind="GreetInput"/>
-        <button type="submit">Greet</button>
-    </form>
-    <p>@GreetMsg</p>
+    <p>GW2 API project</p>
+
+    <button @onclick="GoToSearch">Go to Search Page</button>
 </main>
 
 @code
 {
-    private string? GreetInput { get; set; }
-
-    private string? GreetMsg { get; set; }
-
-    private async Task GreetAsync()
+    private void GoToSearch()
     {
-        GreetMsg = await JsRuntime.InvokeAsync<string>(
-            "__TAURI__.core.invoke",
-            "greet",
-            new { name = GreetInput ?? ""}
-        );
+        Navigation.NavigateTo("/search");
     }
 }
+
+
+
