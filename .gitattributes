@@ -1,0 +1,20 @@
+# Handle line endings
+* text=auto
+
+# Treat Rust files as text
+*.rs text
+
+# Treat frontend files as text
+*.js text
+*.ts text
+*.vue text
+*.css text
+*.html text
+
+# Optional: handle binaries
+*.png binary
+*.jpg binary
+*.ico binary
+
+# Optional: Cargo.lock as text
+Cargo.lock text
