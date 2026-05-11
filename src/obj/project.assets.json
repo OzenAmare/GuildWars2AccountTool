@@ -427,7 +427,7 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
-      "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.6": {
+      "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.7": {
         "type": "package",
         "build": {
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.props": {},
@@ -877,7 +877,7 @@
           "build/Microsoft.NET.ILLink.Tasks.props": {}
         }
       },
-      "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.6": {
+      "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.7": {
         "type": "package",
         "build": {
           "build/Microsoft.NET.Sdk.WebAssembly.Pack.props": {},
@@ -1764,10 +1764,10 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.6": {
-      "sha512": "oFYqOGIx/6iD4IapqC6nk1MhjhdVMjLcMNoUbbwEt9zIGsUnJWQsUhSOoN+mY6HSIE35J3QVsxiCzkCMpLKM7A==",
+    "Microsoft.NET.Sdk.WebAssembly.Pack/10.0.7": {
+      "sha512": "FXBvIwh/CAORqmO75qTy+mnTUuIYidOdNHYhMky0yLcsK6DNFBIP+eeiglhMggtatUSCnAzrCqb1EdwvZq+KAg==",
       "type": "package",
-      "path": "microsoft.net.sdk.webassembly.pack/10.0.6",
+      "path": "microsoft.net.sdk.webassembly.pack/10.0.7",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -1797,7 +1797,7 @@
         "build/Microsoft.NET.Sdk.WebAssembly.Pack.targets",
         "build/Wasm.web.config",
         "build/browser.runtimeconfig.template.json",
-        "microsoft.net.sdk.webassembly.pack.10.0.6.nupkg.sha512",
+        "microsoft.net.sdk.webassembly.pack.10.0.7.nupkg.sha512",
         "microsoft.net.sdk.webassembly.pack.nuspec",
         "tools/net10.0/Microsoft.NET.Sdk.WebAssembly.Pack.Tasks.dll",
         "tools/net10.0/Microsoft.NET.WebAssembly.Webcil.dll",
@@ -1840,23 +1840,23 @@
       "Microsoft.AspNetCore.Components.WebAssembly >= 8.0.19",
       "Microsoft.AspNetCore.Components.WebAssembly.DevServer >= 8.0.19",
       "Microsoft.NET.ILLink.Tasks >= 8.0.26",
-      "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.6"
+      "Microsoft.NET.Sdk.WebAssembly.Pack >= 10.0.7"
     ]
   },
   "packageFolders": {
-    "/home/oamare/.nuget/packages/": {}
+    "/home/ozen/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
+      "projectUniqueName": "/home/ozen/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
       "projectName": "Dotnettauritest",
-      "projectPath": "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
-      "packagesPath": "/home/oamare/.nuget/packages/",
-      "outputPath": "/home/oamare/code/GuildWars2AccountTool/src/obj/",
+      "projectPath": "/home/ozen/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
+      "packagesPath": "/home/ozen/.nuget/packages/",
+      "outputPath": "/home/ozen/code/GuildWars2AccountTool/src/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/oamare/.nuget/NuGet/NuGet.Config"
+        "/home/ozen/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
@@ -1905,7 +1905,7 @@
           "Microsoft.NET.Sdk.WebAssembly.Pack": {
             "suppressParent": "All",
             "target": "Package",
-            "version": "[10.0.6, )",
+            "version": "[10.0.7, )",
             "autoReferenced": true
           }
         },
@@ -1921,14 +1921,6 @@
         "assetTargetFallback": true,
         "warn": true,
         "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[8.0.26, 8.0.26]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[8.0.26, 8.0.26]"
-          },
           {
             "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
             "version": "[8.0.26, 8.0.26]"

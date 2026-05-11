@@ -62,7 +62,7 @@ fn start_oauth_server() -> String{
 async fn oauth2_authoization() -> Result<String, String>{
 
     let url = format!("https://account.guildwars2.com/oauth2/authorize");
-    let client_id = "security meow :3";
+    let client_id = "security meow :3"; //this is defined as a an environment variable in github
     let scopes = "account characters wallet";
     let redirect_uri = start_oauth_server();
 
