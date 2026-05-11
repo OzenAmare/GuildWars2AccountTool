@@ -28,3 +28,5 @@ url = "2.5.8"
 open = "5.3.4"
 tauri-plugin-stronghold = "2"
 
+[profile.dev.package.scypt]
+opt-level = 3
