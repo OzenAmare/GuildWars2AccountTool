@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj": {}
+    "/home/ozen/code/GuildWars2AccountTool/src/Dotnettauritest.csproj": {}
   },
   "projects": {
-    "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj": {
+    "/home/ozen/code/GuildWars2AccountTool/src/Dotnettauritest.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
+        "projectUniqueName": "/home/ozen/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
         "projectName": "Dotnettauritest",
-        "projectPath": "/home/oamare/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
-        "packagesPath": "/home/oamare/.nuget/packages/",
-        "outputPath": "/home/oamare/code/GuildWars2AccountTool/src/obj/",
+        "projectPath": "/home/ozen/code/GuildWars2AccountTool/src/Dotnettauritest.csproj",
+        "packagesPath": "/home/ozen/.nuget/packages/",
+        "outputPath": "/home/ozen/code/GuildWars2AccountTool/src/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/oamare/.nuget/NuGet/NuGet.Config"
+          "/home/ozen/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -63,7 +63,7 @@
             "Microsoft.NET.Sdk.WebAssembly.Pack": {
               "suppressParent": "All",
               "target": "Package",
-              "version": "[10.0.6, )",
+              "version": "[10.0.7, )",
               "autoReferenced": true
             }
           },
@@ -79,14 +79,6 @@
           "assetTargetFallback": true,
           "warn": true,
           "downloadDependencies": [
-            {
-              "name": "Microsoft.AspNetCore.App.Ref",
-              "version": "[8.0.26, 8.0.26]"
-            },
-            {
-              "name": "Microsoft.NETCore.App.Ref",
-              "version": "[8.0.26, 8.0.26]"
-            },
             {
               "name": "Microsoft.NETCore.App.Runtime.Mono.browser-wasm",
               "version": "[8.0.26, 8.0.26]"

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Dotnettauritest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+65ab802dd8b8dc4f0514cf76199bfca1792187ef")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+368a1a314ab513e4404e35111741d349f8463276")]
 [assembly: System.Reflection.AssemblyProductAttribute("Dotnettauritest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Dotnettauritest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
