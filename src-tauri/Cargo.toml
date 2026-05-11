@@ -27,6 +27,7 @@ tiny_http = "0.12.0"
 url = "2.5.8"
 open = "5.3.4"
 tauri-plugin-stronghold = "2"
+tauri-plugin-localhost = "2"
 
-[profile.dev.package.scypt]
+[profile.dev.package.scrypt]
 opt-level = 3

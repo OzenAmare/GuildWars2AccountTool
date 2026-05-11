@@ -1,8 +1,26 @@
+use tauri::Manager;
 use open;
 use std::thread;
 use tiny_http::{Response, Server};
 use url::Url;
 
+//this is where this snippet came from
+//https://v2.tauri.app/plugin/stronghold/
+pub fn run(){
+    tauri::Builder::default()
+        .setup(|app| {
+            let salt_path = app
+                .path()
+                .app_local_data_dir()
+                .expect("could not resolve app local data path")
+                .join("salt.txt");
+            app.handle().plugin(tauri_plugin_stronghold::Builder::with_argon2(&salt_path).build())?;
+
+        Ok(())
+        })
+        .run(tauri::generate_context!())
+            .expect("rror while running tauri application");
+}
 pub async fn start_oauth_server() -> String {
     let redirect_uri = "http://localhost:3000".to_string();
 
