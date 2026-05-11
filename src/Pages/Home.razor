@@ -1,0 +1,30 @@
+﻿@page "/"
+@inject NavigationManager Navigation
+
+<main class="container">
+    <h1>Welcome to Tauri + Blazor</h1>
+
+    <div class="row">
+        <a href="https://tauri.app" target="_blank">
+            <img src="img/tauri.svg" class="logo tauri" alt="Tauri logo"/>
+        </a>
+        <a href="https://dotnet.microsoft.com/en-us/apps/aspnet/web-apps/blazor" target="_blank">
+            <img src="img/blazor.svg" class="logo blazor" alt="Blazor logo"/>
+        </a>
+    </div>
+
+    <p>GW2 API project</p>
+
+    <button @onclick="GoToSearch">Go to Search Page</button>
+</main>
+
+@code
+{
+    private void GoToSearch()
+    {
+        Navigation.NavigateTo("/search");
+    }
+}
+
+
+
