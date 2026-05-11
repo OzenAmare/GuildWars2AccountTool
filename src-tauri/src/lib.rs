@@ -22,7 +22,7 @@ struct Gw2Character {
 }
 
 
-
+//adding in comment to test repo and pipeline for rework
 
 #[tauri::command]
 async fn search_gw2(search_type: String, search_value: String) -> Result<String, String> {
