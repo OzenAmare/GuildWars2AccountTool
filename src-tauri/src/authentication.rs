@@ -28,29 +28,24 @@ pub async fn start_oauth_server() -> String{
 //the sever for oauth2 and return the uri
 }
 
-//pub async fn oauth2_authoization() -> Result<String, String>{
+pub async fn oauth2_authoization() -> Result<String, String>{
 
-  //  let url = format!("https://account.guildwars2.com/oauth2/authorize");
-// let client_id = "security meow :3";
+   //let url = format!("https://account.guildwars2.com/oauth2/authorize");
+    let client_id = "security meow :3";
   //  let scopes = "account characters wallet";
-  //  let redirect_uri = start_oauth_server();
-
-    //let auth_url = format!(
-    ////  "https://account.guildwars2.com/oauth2/authorize?response_type=code&client_id={}&redirect_uri={}&scope=profile",
-        //client_id, redirect_uri
-    //);
-//let auth_url = format!("https://gw2.me/oauth2/authorize?client_id={}&response_type=code&redirect_uri={}&scope=identify&prompt=consent&include_granted_scopes=true", client_id, redirect_uri);
+    let redirect_uri = "http://localhost:3000";
+   let auth_url = format!("https://gw2.me/oauth2/authorize?client_id={}&response_type=code&redirect_uri={}&scope=identify&prompt=consent&include_granted_scopes=true", client_id, redirect_uri);
 //let auth_url = format!("https://gw2.me/oauth2/authorize?client_id={}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&scope=identify&prompt=consent&include_granted_scopes=true", client_id);
   //  println!("meow{}",auth_url);
 
-   //open::that(&auth_url).expect("Failed to open browser");
+   open::that(&auth_url).expect("Failed to open browser");
     //let client = reqwest::Client::new();
     //let resp = client
         //.post(url)
         //.headers();
 
-    //return Ok(auth_url);
-//}
+    return Ok(auth_url);
+}
 
 pub async fn oauth_login() -> Result<String, String>{
     let res = "meow";
