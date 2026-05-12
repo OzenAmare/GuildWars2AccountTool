@@ -1,7 +1,7 @@
 {
   "mainAssemblyName": "Dotnettauritest",
   "resources": {
-    "hash": "sha256-c3gNaSTMKHZOLrN+S4AIK3Gcuq9xnqOpDAX0TW431z4=",
+    "hash": "sha256-uFPiirhLLK8M1pLtX6WtRq0/OL1UgPXlz57FU4knIgw=",
     "jsModuleNative": {
       "dotnet.native.js": "sha256-nElGk+CZFyq0PbPm4JU8avD6lER7x9Z1C54BK7qY12Q="
     },
@@ -47,7 +47,7 @@
       "System.Text.Json.wasm": "sha256-dHfWkiauDRR4KqjK20PrXimk2/s1s7JxkFmx8VuXixA=",
       "System.Text.RegularExpressions.wasm": "sha256-NL5sBkQtOmwbpwZ0yb6AlsOfFlNN4wrT6EdNssIKLIg=",
       "System.Private.CoreLib.wasm": "sha256-mbXXIsHkB30CAY2kEQZvahGIyAEAs3Mntq7bhRw73Mg=",
-      "Dotnettauritest.wasm": "sha256-0VVKA4AbtkFepnwNyuDwmtzsivqAHplVGws7PWVuiI0="
+      "Dotnettauritest.wasm": "sha256-I+f8nUfhXGgGrXdj+pBCGJ3Uo0SgvxFNQMtBRMxmZOM="
     }
   },
   "cacheBootResources": true,

@@ -14,7 +14,7 @@ pub async fn run() -> Result<String,String>{
     Ok(format!("run meow!"))
 }
 
-fn setup(app: &mut tauri::App){
+pub fn setup(app: &mut tauri::App)->  Result<(), Box<dyn std::error::Error>> {
     let snapshot_path = app
         .path()
         .app_data_dir()
@@ -29,6 +29,9 @@ fn setup(app: &mut tauri::App){
     };
 
     app.manage(Mutex::new(state));
+
+    Ok(())
+    
 }
 pub async fn start_oauth_server() -> String {
     let redirect_uri = "http://localhost:3000".to_string();

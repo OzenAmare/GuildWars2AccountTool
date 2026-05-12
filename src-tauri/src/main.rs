@@ -6,13 +6,13 @@ use iota_stronghold::Stronghold;
 
 mod authentication;
 fn main() {
-    //tauri::Builder::default()
-      //  .setup(authentication::setup)
+    tauri::Builder::default()
+        .setup(authentication::setup)
         //.invoke_handler(tauri::generate_handler![
-          //  store_secret,
-            //get_secret
-       // ])
-        //.run(tauri::generate_context!())
-        //.expect("Error running app! Quaggin sad D:");
+        //    store_secret,
+        //    get_secret
+        //])
+        .run(tauri::generate_context!())
+        .expect("Error running app! Quaggin sad D:");
     dotnettauritest_lib::run()
 }
