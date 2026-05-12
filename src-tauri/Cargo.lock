@@ -1127,6 +1127,7 @@ dependencies = [
 name = "dotnettauritest"
 version = "0.1.0"
 dependencies = [
+ "iota_stronghold",
  "open",
  "reqwest",
  "serde",

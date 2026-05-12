@@ -1,19 +1,17 @@
 //use std::process::id;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-use open;
 use serde::Deserialize;
+use tauri::{Config, generate_context};
+use tiny_http::{Server, Response};
+use url::Url; 
 use std::thread;
-use tauri::{generate_context, Config};
-use tiny_http::{Response, Server};
-use url::Url;
-
+use open;
 mod authentication;
-
 #[derive(Deserialize)]
-struct Gw2Item {
+struct Gw2Item{
     name: String,
-    id: u32,
+    id : u32
 }
 
 #[derive(Deserialize)]
@@ -24,11 +22,13 @@ struct Gw2Character {
     race: String,
 }
 
-#[tauri::command]
-async fn authenticate_user(do_something: String) -> String {
-    let cat = format!("meow");
 
-    cat
+#[tauri::command]
+async fn test_something() -> Result<String, String>{
+
+    println!("Starting testing!");
+    authentication::run().await;
+    Ok(format!("done testing :)"))
 }
 
 #[tauri::command]
@@ -41,6 +41,13 @@ async fn search_gw2(search_type: String, search_value: String) -> Result<String,
     }
 }
 
+// this should stay entirely back here. Not called from the front
+async fn authenticate() -> Result<String, String>{
+  
+    authentication::run();
+
+    Ok(format!("Meow"))
+}
 #[tauri::command]
 async fn search_item_by_id(value: String) -> Result<String, String> {
     let id: u32 = value
@@ -55,11 +62,13 @@ async fn search_item_by_id(value: String) -> Result<String, String> {
         .json::<Gw2Item>()
         .await
         .map_err(|e| e.to_string())?;
-
+    
+        
     Ok(format!("{}: {}", id, item.name))
 }
 
 async fn search_item_by_name(value: String) -> Result<String, String> {
+
     let wanted = value.to_lowercase();
 
     println!("Starting item name search for: {}", wanted);
@@ -76,9 +85,14 @@ async fn search_item_by_name(value: String) -> Result<String, String> {
     let mut chunk_index = 0;
 
     for chunk in ids.chunks(200) {
+
         chunk_index += 1;
 
-        println!("Processing chunk {} ({} ids)", chunk_index, chunk.len());
+        println!(
+            "Processing chunk {} ({} ids)",
+            chunk_index,
+            chunk.len()
+        );
 
         let ids_text = chunk
             .iter()
@@ -95,13 +109,23 @@ async fn search_item_by_name(value: String) -> Result<String, String> {
             .await
             .map_err(|e| e.to_string())?;
 
-        println!("Chunk {} returned {} items", chunk_index, items.len());
+        println!(
+            "Chunk {} returned {} items",
+            chunk_index,
+            items.len()
+        );
 
         for item in items {
+
             println!("Checking item: {}", item.name);
 
             if item.name.to_lowercase() == wanted {
-                println!("FOUND MATCH: {} ({})", item.name, item.id);
+
+                println!(
+                    "FOUND MATCH: {} ({})",
+                    item.name,
+                    item.id
+                );
 
                 return Ok(format!("{}: {}", item.id, item.name));
             }
@@ -120,7 +144,8 @@ async fn search_character(character_name: String) -> Result<String, String> {
 
     let url = format!(
         "https://api.guildwars2.com/v2/characters/{}?access_token={}",
-        encoded_name, api_key
+        encoded_name,
+        api_key
     );
 
     let character = reqwest::get(&url)
@@ -132,17 +157,19 @@ async fn search_character(character_name: String) -> Result<String, String> {
 
     Ok(format!(
         "{} is a level {} {} {}",
-        character.name, character.level, character.race, character.profession
+        character.name,
+        character.level,
+        character.race,
+        character.profession
     ))
 }
+
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
-        .plugin(tauri_plugin_localhost::Builder::new(todo!()).build())
-        .plugin(tauri_plugin_stronghold::Builder::new(|pass| todo!()).build())
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![search_gw2, authenticate_user])
+        .invoke_handler(tauri::generate_handler![search_gw2, test_something])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

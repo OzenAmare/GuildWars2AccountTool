@@ -1,4 +1,6 @@
+use iota_stronghold::Stronghold;
 use tauri::Manager;
+use std::sync::Mutex;
 use open;
 use std::thread;
 use tiny_http::{Response, Server};
@@ -6,20 +8,27 @@ use url::Url;
 
 //this is where this snippet came from
 //https://v2.tauri.app/plugin/stronghold/
-pub fn run(){
-    tauri::Builder::default()
-        .setup(|app| {
-            let salt_path = app
-                .path()
-                .app_local_data_dir()
-                .expect("could not resolve app local data path")
-                .join("salt.txt");
-            app.handle().plugin(tauri_plugin_stronghold::Builder::with_argon2(&salt_path).build())?;
+pub async fn run() -> Result<String,String>{
+    println!("in run function!");
+   
+    Ok(format!("run meow!"))
+}
 
-        Ok(())
-        })
-        .run(tauri::generate_context!())
-            .expect("rror while running tauri application");
+fn setup(app: &mut tauri::App){
+    let snapshot_path = app
+        .path()
+        .app_data_dir()
+        .expect("missing app data directory")
+        .join("stronghold.quaggin");
+
+    let stronghold = Stronghold::default();
+
+    let state = StrongholdState{
+        stronghold,
+        snapshot_path: snapshot_path.to_string_lossy().to_string(),
+    };
+
+    app.manage(Mutex::new(state));
 }
 pub async fn start_oauth_server() -> String {
     let redirect_uri = "http://localhost:3000".to_string();
@@ -66,4 +75,9 @@ pub async fn oauth_login() -> Result<String, String> {
     return Ok(format!("meow {}", res));
     //oauth2_authoization();
     //return res.await;
+}
+
+pub struct StrongholdState{
+    pub stronghold: Stronghold,
+    pub snapshot_path: String
 }
