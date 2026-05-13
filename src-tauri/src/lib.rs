@@ -7,7 +7,6 @@ use tiny_http::{Server, Response};
 use url::Url; 
 use std::thread;
 use open;
-mod authentication;
 #[derive(Deserialize)]
 struct Gw2Item{
     name: String,
@@ -23,13 +22,6 @@ struct Gw2Character {
 }
 
 
-#[tauri::command]
-async fn test_something() -> Result<String, String>{
-
-    println!("Starting testing!");
-    authentication::run().await;
-    Ok(format!("done testing :)"))
-}
 
 #[tauri::command]
 async fn search_gw2(search_type: String, search_value: String) -> Result<String, String> {
@@ -41,13 +33,6 @@ async fn search_gw2(search_type: String, search_value: String) -> Result<String,
     }
 }
 
-// this should stay entirely back here. Not called from the front
-async fn authenticate() -> Result<String, String>{
-  
-    authentication::run();
-
-    Ok(format!("Meow"))
-}
 #[tauri::command]
 async fn search_item_by_id(value: String) -> Result<String, String> {
     let id: u32 = value
@@ -169,7 +154,7 @@ async fn search_character(character_name: String) -> Result<String, String> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .invoke_handler(tauri::generate_handler![search_gw2, test_something])
+        .invoke_handler(tauri::generate_handler![search_gw2])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

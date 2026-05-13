@@ -8,31 +8,31 @@ use url::Url;
 
 //this is where this snippet came from
 //https://v2.tauri.app/plugin/stronghold/
-pub async fn run() -> Result<String,String>{
-    println!("in run function!");
-   
-    Ok(format!("run meow!"))
+
+//this ***should*** act a singleton in this section. Good.
+lazy_static! {
+    static ref VAULT: Mutex<Vault> = Mutex::new(Vault{
+        stronghold: Stronghold::default(),
+        snapshot_path: "stronghold.quaggin".to_string()
+    })
 }
 
-pub fn setup(app: &mut tauri::App)->  Result<(), Box<dyn std::error::Error>> {
-    let snapshot_path = app
-        .path()
-        .app_data_dir()
-        .expect("missing app data directory")
-        .join("stronghold.quaggin");
-
-    let stronghold = Stronghold::default();
-
-    let state = StrongholdState{
-        stronghold,
-        snapshot_path: snapshot_path.to_string_lossy().to_string(),
-    };
-
-    app.manage(Mutex::new(state));
-
-    Ok(())
-    
+pub fn store_code(key: &str, value: &str){
+    let mut vault = VAULT.lock().unwrap();
+    vaultstornghold.store_secret(key, value);
 }
+
+pub fn get_value(key: &str) -> &str{
+    let vault = VAULT.lock().unwrap();
+    vault.stronghold.retrieve_secret(key);
+
+    let mut kitty = "Meow :3";
+
+    kitty 
+}
+
+
+
 pub async fn start_oauth_server() -> String {
     let redirect_uri = "http://localhost:3000".to_string();
 
@@ -80,7 +80,13 @@ pub async fn oauth_login() -> Result<String, String> {
     //return res.await;
 }
 
-pub struct StrongholdState{
-    pub stronghold: Stronghold,
-    pub snapshot_path: String
+
+struct Vault {
+     stronghold: Stronghold,
+     snapshot_path: String
+}
+
+ struct StrongholdState{
+    stronghold: Stronghold,
+    std::sync::Mutex
 }
