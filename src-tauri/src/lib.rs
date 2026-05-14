@@ -1,12 +1,46 @@
 //use std::process::id;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
+//use std::collections::HashMap;
+use std::fs;
 
-#[derive(Deserialize)]
-struct Gw2Item{
+#[derive(Debug, Deserialize, Serialize, Clone)]
+struct Gw2Item {
+    id: u32,
+    chat_link: String,
     name: String,
-    id : u32
+
+    icon: Option<String>,
+    description: Option<String>,
+
+    #[serde(rename = "type")]
+    item_type: String,
+
+    rarity: String,
+    level: u32,
+    vendor_value: u32,
+
+    default_skin: Option<u32>,
+
+    flags: Vec<String>,
+
+    #[serde(default)]
+    game_types: Vec<String>,
+
+    #[serde(default)]
+    restrictions: Vec<String>,
+
+    upgrades_into: Option<Vec<Gw2Upgrade>>,
+    upgrades_from: Option<Vec<Gw2Upgrade>>,
+
+    details: Option<serde_json::Value>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+struct Gw2Upgrade {
+    upgrade: String,
+    item_id: u32,
 }
 
 #[derive(Deserialize)]
@@ -18,6 +52,78 @@ struct Gw2Character {
 }
 
 
+// cache file? 
+const CACHE_FILE: &str = "items_cache.json";
+
+fn load_items_from_file() -> Result<Vec<Gw2Item>, String> {
+    let text = fs::read_to_string(CACHE_FILE)
+        .map_err(|e| e.to_string())?;
+
+    let items: Vec<Gw2Item> = serde_json::from_str(&text)
+        .map_err(|e| e.to_string())?;
+
+    Ok(items)
+}
+
+async fn fetch_all_items_from_api() -> Result<Vec<Gw2Item>, String> {
+    let mut all_items: Vec<Gw2Item> = Vec::new();
+
+    let ids = reqwest::get("https://api.guildwars2.com/v2/items")
+        .await
+        .map_err(|e| e.to_string())?
+        .json::<Vec<u32>>()
+        .await
+        .map_err(|e| e.to_string())?;
+
+    for chunk in ids.chunks(200) {
+        let ids_text = chunk
+            .iter()
+            .map(|id| id.to_string())
+            .collect::<Vec<String>>()
+            .join(",");
+
+        let url = format!("https://api.guildwars2.com/v2/items?ids={}", ids_text);
+
+        let items = reqwest::get(&url)
+            .await
+            .map_err(|e| e.to_string())?
+            .json::<Vec<Gw2Item>>()
+            .await
+            .map_err(|e| e.to_string())?;
+
+        all_items.extend(items);
+    }
+
+    Ok(all_items)
+}
+
+
+fn save_items_to_file(items: &Vec<Gw2Item>) -> Result<(), String> {
+    let json = serde_json::to_string(items)
+        .map_err(|e| e.to_string())?;
+
+    fs::write(CACHE_FILE, json)
+        .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+async fn get_all_items_cached() -> Result<Vec<Gw2Item>, String> {
+    if let Ok(items) = load_items_from_file() {
+        println!("Loaded {} items from cache file", items.len());
+        return Ok(items);
+    }
+
+    println!("No cache file found. Fetching all items from API...");
+
+    let items = fetch_all_items_from_api().await?;
+
+    save_items_to_file(&items)?;
+
+    println!("Saved {} items to cache file", items.len());
+
+    Ok(items)
+}
 
 
 #[tauri::command]
@@ -29,7 +135,6 @@ async fn search_gw2(search_type: String, search_value: String) -> Result<String,
         _ => Err("Unknown search type".to_string()),
     }
 }
-
 
 
 
@@ -56,70 +161,32 @@ async fn search_item_by_name(value: String) -> Result<String, String> {
 
     let wanted = value.to_lowercase();
 
-    println!("Starting item name search for: {}", wanted);
+    println!("Searching cache for '{}'", wanted);
 
-    let ids = reqwest::get("https://api.guildwars2.com/v2/items")
-        .await
-        .map_err(|e| e.to_string())?
-        .json::<Vec<u32>>()
-        .await
-        .map_err(|e| e.to_string())?;
+    let items = get_all_items_cached().await?;
 
-    println!("Fetched {} item IDs", ids.len());
+    for item in items {
 
-    let mut chunk_index = 0;
+        if item.name.to_lowercase() == wanted {
 
-    for chunk in ids.chunks(200) {
+            println!(
+                "Found {} ({})",
+                item.name,
+                item.id
+            );
 
-        chunk_index += 1;
-
-        println!(
-            "Processing chunk {} ({} ids)",
-            chunk_index,
-            chunk.len()
-        );
-
-        let ids_text = chunk
-            .iter()
-            .map(|id| id.to_string())
-            .collect::<Vec<String>>()
-            .join(",");
-
-        let url = format!("https://api.guildwars2.com/v2/items?ids={}", ids_text);
-
-        let items = reqwest::get(&url)
-            .await
-            .map_err(|e| e.to_string())?
-            .json::<Vec<Gw2Item>>()
-            .await
-            .map_err(|e| e.to_string())?;
-
-        println!(
-            "Chunk {} returned {} items",
-            chunk_index,
-            items.len()
-        );
-
-        for item in items {
-
-            println!("Checking item: {}", item.name);
-
-            if item.name.to_lowercase() == wanted {
-
-                println!(
-                    "FOUND MATCH: {} ({})",
-                    item.name,
-                    item.id
-                );
-
-                return Ok(format!("{}: {}", item.id, item.name));
-            }
+            return Ok(format!(
+                "{}: {}",
+                item.id,
+                item.name
+            ));
         }
     }
 
-    println!("No item found");
-
-    Err(format!("No item found named '{}'", value))
+    Err(format!(
+        "No item found named '{}'",
+        value
+    ))
 }
 
 async fn search_character(character_name: String) -> Result<String, String> {

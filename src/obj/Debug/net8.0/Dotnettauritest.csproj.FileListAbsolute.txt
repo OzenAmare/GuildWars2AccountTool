@@ -2068,6 +2068,6 @@ C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\Dotnettauritest.pdb
 C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\ref\Dotnettauritest.dll
 C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\scopedcss\Pages\Search.razor.rz.scp.css
 C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\scopedcss\projectbundle\Dotnettauritest.bundle.scp.css
-C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\compressed\i34pyexkj8-{0}-djededxi4g-djededxi4g.gz
-C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\compressed\x1naq7hdqx-{0}-jg2yorhq9z-jg2yorhq9z.gz
-C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\compressed\38rlone8pd-{0}-hrwvxq6txe-hrwvxq6txe.gz
+C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\compressed\i34pyexkj8-{0}-jpptxnwf9x-jpptxnwf9x.gz
+C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\compressed\x1naq7hdqx-{0}-pe5o5td12p-pe5o5td12p.gz
+C:\Software_Personal\GW2_API_project\src\obj\Debug\net8.0\compressed\38rlone8pd-{0}-48cat5lhe2-48cat5lhe2.gz
