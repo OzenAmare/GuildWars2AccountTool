@@ -31,9 +31,11 @@ pub fn get_value(key: &str) -> &str{
     kitty 
 }
 
-
-
-pub async fn start_oauth_server() -> String {
+//A section of the code should have to ask for a defined scope
+pub async fn get_token(objects: <Vec![]>) -> &str{
+    "dogs :3"
+}
+async fn start_oauth_server() -> String {
     let redirect_uri = "http://localhost:3000".to_string();
 
     thread::spawn(move || {
@@ -55,7 +57,7 @@ pub async fn start_oauth_server() -> String {
     //the sever for oauth2 and return the uri
 }
 
-pub async fn oauth2_authoization() -> Result<String, String> {
+async fn oauth2_authoization() -> Result<String, String> {
     //let url = format!("https://account.guildwars2.com/oauth2/authorize");
     let client_id = "security meow :3";
     //  let scopes = "account characters wallet";
@@ -73,7 +75,7 @@ pub async fn oauth2_authoization() -> Result<String, String> {
     return Ok(auth_url);
 }
 
-pub async fn oauth_login() -> Result<String, String> {
+async fn oauth_login() -> Result<String, String> {
     let res = "meow";
     return Ok(format!("meow {}", res));
     //oauth2_authoization();
