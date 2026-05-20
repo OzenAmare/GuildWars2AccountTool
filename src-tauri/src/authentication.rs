@@ -1,94 +1,86 @@
+use axum::{
+    routing::get, 
+    Router,
+    serve::Serve
+};
 use iota_stronghold::Stronghold;
-use tauri::Manager;
-use std::sync::Mutex;
 use open;
+use std::sync::Mutex;
 use std::thread;
+use tauri::Manager;
 use tiny_http::{Response, Server};
 use url::Url;
-
+use tokio;
 //this is where this snippet came from
 //https://v2.tauri.app/plugin/stronghold/
+//
+//
+//
 
-//this ***should*** act a singleton in this section. Good.
-lazy_static! {
-    static ref VAULT: Mutex<Vault> = Mutex::new(Vault{
-        stronghold: Stronghold::default(),
-        snapshot_path: "stronghold.quaggin".to_string()
-    })
+pub async fn request_account_data_access() -> Result<String,String>{
+ 
+    let started_port = start_oauth_server().await;
+    let request_confirmed = request_redirect(started_port.unwrap()).await;
+    Ok("mewo".to_string())
 }
 
-pub fn store_code(key: &str, value: &str){
-    let mut vault = VAULT.lock().unwrap();
-    vaultstornghold.store_secret(key, value);
-}
 
-pub fn get_value(key: &str) -> &str{
-    let vault = VAULT.lock().unwrap();
-    vault.stronghold.retrieve_secret(key);
+async fn start_oauth_server() -> Result<u16, u16> {
+    let app = Router::new().route("/callback", get(|| async { "You can close this window now :3" }));
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
 
-    let mut kitty = "Meow :3";
+     println!("axum is starting the server at localhost:3000...");
 
-    kitty 
-}
+     let port = listener
+         .local_addr()
+         .map_err(|_| 2u16)?
+         .port();
 
-//A section of the code should have to ask for a defined scope
-pub async fn get_token(objects: <Vec![]>) -> &str{
-    "dogs :3"
-}
-async fn start_oauth_server() -> String {
-    let redirect_uri = "http://localhost:3000".to_string();
-
-    thread::spawn(move || {
-        let server = Server::http("127.0.0.1:3000/").unwrap();
-
-        for request in server.incoming_requests() {
-            let url = Url::parse(&format!("http://localhost{}", request.url())).unwrap();
-            if let Some(code) = url.query_pairs().find(|(k, _)| k == "code") {
-                println!("oauth code recieved");
-            }
-
-            let response =
-                Response::from_string("<html><body>you can close this now</body></html>");
-            request.respond(response).unwrap();
-        }
+    tokio::spawn(async move {
+       if let Err(err) = axum::serve(listener, app).await {
+           eprintln!("Server error: {err}");
+       }
     });
-    redirect_uri
-    //this will handle
-    //the sever for oauth2 and return the uri
+
+   
+    Ok(port)
 }
 
-async fn oauth2_authoization() -> Result<String, String> {
-    //let url = format!("https://account.guildwars2.com/oauth2/authorize");
-    let client_id = "security meow :3";
-    //  let scopes = "account characters wallet";
-    let redirect_uri = "http://localhost:3000";
-    let auth_url = format!("https://gw2.me/oauth2/authorize?client_id={}&response_type=code&redirect_uri={}&scope=identify&prompt=consent&include_granted_scopes=true", client_id, redirect_uri);
-    //let auth_url = format!("https://gw2.me/oauth2/authorize?client_id={}&response_type=code&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2F&scope=identify&prompt=consent&include_granted_scopes=true", client_id);
-    //  println!("meow{}",auth_url);
+async fn request_redirect(port: u16) -> Result<String, String> {
+    
+    let redirect_uri = "http://127.0.0.1/"; //, port);
 
-    open::that(&auth_url).expect("Failed to open browser");
-    //let client = reqwest::Client::new();
-    //let resp = client
-    //.post(url)
-    //.headers();
-
-    return Ok(auth_url);
-}
-
-async fn oauth_login() -> Result<String, String> {
-    let res = "meow";
-    return Ok(format!("meow {}", res));
-    //oauth2_authoization();
-    //return res.await;
+    //lets paramterize all of these seperately 
+    let auth_link = "https://gw2.me/oauth2/authorize?";
+    let request_url = Url::parse_with_params(auth_link, 
+        &[
+        ("client_id", "b185490f-b41b-40bc-9b1d-a5d7eb22ac68"),
+        ("response_type", "code"),
+        ("redirect_uri", "http://127.0.0.1:3000/callback"),
+        ("scope", "identify"),
+        ("prompt", "consent"),
+        ("include_granted_scopes", "true")
+        ]);
+    
+    let string_url = request_url.unwrap().to_string();
+    println!("{}", string_url);
+    open::that(string_url);
+       // .append_pair("client_id", "client_id_secret")
+        //.append_pair("response_type", "code")
+       // .append_pair("redirect_uri", &redirect_uri)
+       // .append_pair("scope", "identity");
+    Ok("meow".to_string())
 }
 
 
 struct Vault {
-     stronghold: Stronghold,
-     snapshot_path: String
+    stronghold: Stronghold,
+    snapshot_path: String,
 }
 
- struct StrongholdState{
+struct StrongholdState {
     stronghold: Stronghold,
-    std::sync::Mutex
+    storage: std::sync::Mutex<String>,
 }
