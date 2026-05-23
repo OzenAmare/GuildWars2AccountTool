@@ -1179,6 +1179,7 @@ dependencies = [
 name = "dotnettauritest"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "axum",
  "iota_stronghold",
  "oneshot",
