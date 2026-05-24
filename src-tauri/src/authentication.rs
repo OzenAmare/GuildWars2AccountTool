@@ -11,11 +11,16 @@ use tiny_http::{Response, Server};
 use url::Url;
 use tokio;
 use axum::extract::Query;
+use std::sync::Arc;
 use axum::response::Html;
 use serde::Deserialize;
-use tauri_plugin_stronghold::stronghold::Stronghold;
+use iota_stronghold::Stronghold;
 use anyhow::Result;
 use std::path::PathBuf;
+use once_cell::sync::OnceCell;
+use tauri::AppHandle;
+use getrandom;
+use std::fs;
 //this is where this snippet came from
 //https://v2.tauri.app/plugin/stronghold/
 //
@@ -23,98 +28,17 @@ use std::path::PathBuf;
 //
 //
 
-// async fn initialize_stronghold_vault() -> Result<String, String>{
-//
-//     //creates the local stronghold vault to be operated with
-//     tauri::Builder::default()
-//         .setup(|app| {
-//             let salt_path = app
-//                 .path()
-//                 .app_local_data_dir()
-//                 .expect("could not resolve app local data path")
-//                 .join("quaggin.vault");
-//
-//             let vault_path = app
-//                 .path()
-//                 .app_local_data_dir()
-//                 .expect("could not resolve the path this time")
-//                 .join("quaggin.hold");
-//
-//
-//
-//             app.handle().plugin(tauri_plugin_stronghold::Builder::with_argon2(&salt_path).build())?;
-//
-//             let stronghold = app.handle().stronghold();
-//
-//             stronghold.save(&vault_path).map_err(|e| anyhow::anyhow!(e.to_string))?;
-//
-//
-//             Ok(())
-//         });
-//
-//
-//
-//
-//
-//     Ok("meow".to_string())
-// }
-
-// async fn stornghold_save_and_commit() -> Result<String, String>{
-//
-//     let stronghold = Stronghold::default();
-//
-//     stronghold.commit(&vault_path).map_err(|e| anyhow::anyhow!(e))?;
-//
-//     stronghold.save().map_err(|e| anyhow::anyhow!(e))?;
-// }
 
 
-impl QuagginStronghold{
-    pub fn new(app: &tauri::AppHandle) -> Result<Self, String>{
 
-        let app_dir = app
-            .path()
-            .app_local_data_dir()
-            .map_err(|e| e.to_string())?;
+async fn get_user_consent() -> Result<String, String>{
 
-        let vault_path = app_dir.join("quaggin.hold");
-
-        //need to derive key eventually from local user system or something
-        let password = b"need-to-derive-key".to_vec();
-
-        let stronghold = Stronghold::new(&vault_path, password)
-            .map_err(|e| e.to_string())?;
-
-        Ok(Self{
-            stronghold,
-            vault_path
-        })
-
-    }
-}
-
-impl QuagginStronghold {
-    pub fn save(&self) -> Result<(), String>{
-        self.stronghold
-            .save()
-            .map_err(|e| e.to_string())
-    }
-}
-pub async fn request_account_data_access() -> Result<String,String>{
-
-    //let stronghold_start = initialize_stronghold_vault().await;
- 
-   // let started_port = start_oauth_server().await;
-    let request_confirmed = request_redirect().await;
-    Ok("mewo".to_string())
-}
-
-
-async fn request_redirect() -> Result<String, String>{
-
+    //this function starts a webserver and returns their initial key for authorized access
     let (tx, rx) = oneshot::channel::<String>();
 
     let tx = std::sync::Arc::new(std::sync::Mutex::new(Some(tx)));
+
+    let mut auth_code = "";
 
         let app = Router::new().route(
         "/callback", 
@@ -128,7 +52,7 @@ async fn request_redirect() -> Result<String, String>{
                     println!("recieved the auth code {}", params.code);
 
                     if let Some(sender) = tx.lock().unwrap().take(){
-                        let _ = sender.send(params.code.clone());
+                        let auth_code = sender.send(params.code.clone());
                     }
            
                  Html("You can close this window now :3")
@@ -149,10 +73,11 @@ async fn request_redirect() -> Result<String, String>{
            eprintln!("Server error: {err}");
        }   
     });
-    
+   
+    //we need to add a randomly generated string to use as a code challenge
     //lets paramterize all of these seperately 
-    let auth_link = "https://gw2.me/oauth2/authorize?";
-    let request_url = Url::parse_with_params(auth_link, 
+    let oauth2_link = "https://gw2.me/oauth2/authorize?";
+    let request_url = Url::parse_with_params(oauth2_link, 
         &[
         ("client_id", "b185490f-b41b-40bc-9b1d-a5d7eb22ac68"),
         ("response_type", "code"),
@@ -160,6 +85,8 @@ async fn request_redirect() -> Result<String, String>{
         ("scope", "identify"),
         ("prompt", "consent"),
         ("include_granted_scopes", "true")
+        //,
+        //("code_verifier", "PKCE challenge"),
         ]);
     
     let string_url = request_url.unwrap().to_string();
@@ -167,16 +94,56 @@ async fn request_redirect() -> Result<String, String>{
     open::that(string_url);
 
        
-    Ok("meow".to_string())
+    Ok(auth_code.to_string())
 }
 
 
-struct QuagginStronghold{
-    stronghold: Stronghold,
-    vault_path: PathBuf
+pub struct QuagginSecurity{
+    pub stronghold: Arc<tokio::sync::Mutex<Stronghold>>,
+    pub authentication_configuration: AuthenticationConfiguration
+    
 }
+
+ impl QuagginSecurity{
+   pub async fn request_private_access(&self){
+       let dog = get_user_consent().await;
+       println!("This is the auth code: {:?}", dog);
+
+    }
+   async fn flip_access_token(&self){
+       //this is where we'll get the proper access token and secure it in our framework
+       //we need to hit this endpoint-> https://gw2.me/api/token
+       //the following parameters are needed:
+       //grant_type| "refresh_token" | Literally what we're asking for 
+       //refresh_token| String |the refresh token itself 
+       //client_id| String |our client id 
+       //client_secret| String |our client secret
+   }
+}
+
+#[derive(Deserialize)]
+pub struct AuthenticationConfiguration{
+    pub redirect_routing_endpoint: String,
+    pub redirect_uri: String,
+    pub oauth2_link: String,
+    pub stronghold_snapshot_file: String,
+    pub stronghold_storage_file: String,
+    pub Oauth2Configuration: Oauth2Configuration,
+}
+#[derive(Deserialize)]
+pub struct Oauth2Configuration{
+    pub client_id: String,
+    pub response_type: String,
+    pub scope: String,
+    pub prompt: String,
+    pub include_granted_scopes: String,
+}
+
+
+
 
 #[derive(Debug, Deserialize)]
 struct OAuthCallback {
     code: String,
 }
+
