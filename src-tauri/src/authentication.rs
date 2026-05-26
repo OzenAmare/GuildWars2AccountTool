@@ -119,7 +119,7 @@ async fn get_user_consent() -> Result<String>{
 
 pub struct QuagginSecurity{
     pub stronghold: Arc<tokio::sync::Mutex<Stronghold>>,
-    pub authentication_configuration: AuthenticationConfiguration
+    pub security_configuration: SecurityConfiguration
     
 }
 
@@ -140,27 +140,27 @@ pub struct QuagginSecurity{
    }
 }
 
-#[derive(Deserialize)]
-pub struct AuthenticationConfiguration{
-    pub keyring_entry_name: String,
-    pub keyring_username: String,
-    pub redirect_routing_endpoint: String,
-    pub redirect_uri: String,
-    pub oauth2_link: String,
-    pub stronghold_snapshot_file: String,
-    pub stronghold_storage_file: String,
-    pub Oauth2Configuration: Oauth2Configuration,
+#[derive(Deserialize, Clone)]
+pub struct SecurityConfiguration{
+     keyring_entry_name: String,
+     keyring_username: String,
+     redirect_routing_endpoint: String,
+     redirect_uri: String,
+     oauth2_link: String,
+     stronghold_snapshot_file: String,
+     stronghold_storage_file: String,
+     Oauth2Configuration: Oauth2Configuration,
 }
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct Oauth2Configuration{
-    pub client_id: String,
-    pub response_type: String,
-    pub scope: String,
-    pub prompt: String,
-    pub include_granted_scopes: String,
+     client_id: String,
+     response_type: String,
+     scope: String,
+     prompt: String,
+     include_granted_scopes: String,
 }
 
-impl AuthenticationConfiguration{
+impl SecurityConfiguration{
     fn get_keyring_entry_name(&self) -> &str{
         &self.keyring_entry_name
     }

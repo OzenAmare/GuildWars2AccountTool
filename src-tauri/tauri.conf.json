@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.oamare.dotnettauritest",
   "plugins":{
-    "authentication_configuration":{
+    "security_configuration":{
       "keyring_entry_name": "QUAGGIN_STRONGHOLD_PASSWORD",
-      "keyring_user_name": "quaggin",
+      "keyring_username": "quaggin",
       "stronghold_snapshot_file": "quaggin_security_snapshot.snapshot",
       "stronghold_storage_file": "quaggin_security_storage.dat",
       "redirect_routing_endpoint": "/callback",
