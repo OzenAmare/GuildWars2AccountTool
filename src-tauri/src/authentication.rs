@@ -15,11 +15,30 @@ use std::sync::Arc;
 use axum::response::Html;
 use serde::Deserialize;
 use iota_stronghold::Stronghold;
-use anyhow::Result;
+//use anyhow::Result as OtherResult;
 use std::path::PathBuf;
 use once_cell::sync::OnceCell;
+//use secrets;
 use tauri::AppHandle;
 use getrandom;
+use keyring_core::{
+    mock,
+    sample,
+    Entry,
+    Result
+};
+
+//use keyring;
+use keyring;
+use rand::RngExt;
+// use rand::{
+//     thread_rng,
+//     Rng
+// };
+use base64::{
+    engine::general_purpose::STANDARD,
+    Engine
+};
 use std::fs;
 //this is where this snippet came from
 //https://v2.tauri.app/plugin/stronghold/
@@ -31,7 +50,7 @@ use std::fs;
 
 
 
-async fn get_user_consent() -> Result<String, String>{
+async fn get_user_consent() -> Result<String>{
 
     //this function starts a webserver and returns their initial key for authorized access
     let (tx, rx) = oneshot::channel::<String>();
@@ -123,6 +142,8 @@ pub struct QuagginSecurity{
 
 #[derive(Deserialize)]
 pub struct AuthenticationConfiguration{
+    pub keyring_entry_name: String,
+    pub keyring_username: String,
     pub redirect_routing_endpoint: String,
     pub redirect_uri: String,
     pub oauth2_link: String,
@@ -139,11 +160,96 @@ pub struct Oauth2Configuration{
     pub include_granted_scopes: String,
 }
 
+impl AuthenticationConfiguration{
+    fn get_keyring_entry_name(&self) -> &str{
+        &self.keyring_entry_name
+    }
+    fn get_keyring_username(&self) -> &str{
+        &self.keyring_username
+    }
+    pub fn return_or_create_keyring_entry(&self) -> Result<()>{
+        
+        println!("attempting wallet store....");
+
+        let mut file = "home/ozen/Documents/test.txt";
+
+         keyring_core::set_default_store(sample::Store::new_with_backing(&file)?);
+       
+        let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_username)?; 
+        //otherwise go ahead and generate a new one using standard base64 
+        let mut bytes = [0u8; 32];
+        rand::rng().fill(&mut bytes);
+        let new_secret = STANDARD.encode(bytes);
+
+        println!("The new secret is {}", &new_secret);
+
+        //let dogs = keyring_entry.get_default_store()?;
+
+        keyring_entry.set_password(&new_secret)?;
+        let password = keyring_entry.get_password()?;
+        println!("This is the password!: {}", password);
+
+        Ok(())
 
 
+    }
+
+}
+
+
+
+//
+// pub struct StrongholdKeyRingEntry<authentication_configuration: AuthenticationConfiguration>{
+//      keyring_entry_name: String,
+//      keyring_user_name: String,
+// }
+//
+// impl StrongholdKeyRingEntry<authentication_configuration: AuthenticationConfiguration>{
+//     fn get_keyring_entry_name(&self, AuthenticationConfiguration: &AuthenticationConfiguration) -> &str{
+//         let self.keyring_entry_name = AuthenticationConfiguration.keyring_entry_name;
+//         &self.keyring_entry_name
+//     }
+//     fn get_keyring_user_name(AuthenticationConfiguration: AuthenticationConfiguration) -> &str{
+//         let self.keyring_user_name = AuthenticationConfiguration.keyring_user_name;
+//         &self.keyring_user_name
+//     }
+//  }
+
+
+// impl StrongholdKeyRingEntry{
+//     pub fn get_or_create_stronghold_password(&self) -> Result<()>{
+//
+//         println!("attempting wallet store....");
+//
+//         let mut file = "home/ozen/Documents/test.txt";
+//
+//          keyring_core::set_default_store(sample::Store::new_with_backing(&file)?);
+//
+//         let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_user_name)?; 
+//         //otherwise go ahead and generate a new one using standard base64 
+//         let mut bytes = [0u8; 32];
+//         rand::rng().fill(&mut bytes);
+//         let new_secret = STANDARD.encode(bytes);
+//
+//         println!("The new secret is {}", &new_secret);
+//
+//         //let dogs = keyring_entry.get_default_store()?;
+//
+//         keyring_entry.set_password(&new_secret)?;
+//         let password = keyring_entry.get_password()?;
+//         println!("This is the password!: {}", password);
+//
+//         Ok(())
+//     }
+// }
+fn get_arg_string(position: usize, default: &str) -> String {
+    std::env::args()
+        .nth(position)
+        .unwrap_or_else(|| String::from(default))
+}
 
 #[derive(Debug, Deserialize)]
-struct OAuthCallback {
+struct OAuthCallback{
     code: String,
 }
 

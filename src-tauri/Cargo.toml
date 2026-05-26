@@ -33,9 +33,10 @@ axum = "0.8.9"
 tokio = "1.52.3"
 oneshot = "0.2.1"
 anyhow = "1.0.102"
-rand = "0.10.1"
+rand = { version = "0.10.1", features = ["thread_rng"] }
 getrandom = "0.4.2"
 once_cell = "1.21.4"
-
-[profile.dev.package.scrypt]
-opt-level = 3
+keyring = "4.0.1"
+base64 = "0.22.1"
+keyring-core = "1.0.0"
+rand_core = "0.10.1"

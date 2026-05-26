@@ -5,12 +5,14 @@
   "identifier": "com.oamare.dotnettauritest",
   "plugins":{
     "authentication_configuration":{
+      "keyring_entry_name": "QUAGGIN_STRONGHOLD_PASSWORD",
+      "keyring_user_name": "quaggin",
       "stronghold_snapshot_file": "quaggin_security_snapshot.snapshot",
       "stronghold_storage_file": "quaggin_security_storage.dat",
       "redirect_routing_endpoint": "/callback",
       "redirect_uri": "127.0.0.1:3000",
       "oauth2_link": "https://gw2.me/oaut2/authorize?",
-      "parameters": {
+      "Oauth2Configuration": {
         "client_id": "b185490f-b41b-40bc-9b1d-a5d7eb22ac68",
         "response_type": "code",
         "scope": "identify",

@@ -3,7 +3,10 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 mod authentication;
-use authentication::{QuagginSecurity, AuthenticationConfiguration};
+use authentication::{
+    QuagginSecurity, 
+    AuthenticationConfiguration
+};
 use open;
 use serde::Deserialize;
 use std::thread;
@@ -14,7 +17,11 @@ use std::sync::Mutex;
 use std::sync::Arc;
 use tauri::Manager;
 use tauri::AppHandle;
-use iota_stronghold::Stronghold;
+use iota_stronghold::{
+    Stronghold,
+    SnapshotPath,
+    KeyProvider
+};
 #[derive(Deserialize)]
 struct Gw2Item {
     name: String,
@@ -30,10 +37,20 @@ struct Gw2Character {
 }
 
 #[tauri::command]
-async fn test_oauth(app: AppHandle) -> Result<String, String> {
-    let handler = app.state::<AppHandler>();
+async fn test_oauth() -> Result<String, String> {
 
-    handler.QuagginSecurity.request_private_access().await;
+     // let test_keyring = StrongholdKeyRingEntry{
+     //             service_name: format!("test_name"),
+     //             service_user: format!("test_user")
+     //         };
+     //
+     // let cat = test_keyring.get_or_create_stronghold_password()
+     //     .map_err(|e| e.to_string())?;
+     //
+    // put app:AppHandler back in laters 
+    //let handler = app.state::<AppHandler>();
+
+   // handler.QuagginSecurity.request_private_access().await;
     Ok("meow".to_string())
 }
 
@@ -146,44 +163,76 @@ async fn search_character(character_name: String) -> Result<String, String> {
 pub fn run() {
 
     tauri::Builder::default()
-        .setup(|app| {
-            let config = app.config();
-
-             let app_dir = app
-                .path()
-                .app_local_data_dir()
-                .expect("failed to start tauri at app dir");
-
-
-            let raw_authenication_configuration = app.config().plugins.0.get("authentication_configuration").unwrap();
-
-            let authentication_configuration: AuthenticationConfiguration = serde_json::from_value(raw_authenication_configuration.clone()).unwrap();
-
-            let stronghold = Stronghold::default();
-            
-            stronghold.load_snapshot(app_dir.join(authentication_configuration.stronghold_snapshot_file));
-            let quaggin_stronghold_storage_file = app_dir.join(authentication_configuration.stronghold_storage_file);
-            let quaggin_stronghold = Stronghold::new(
-                quaggin_stronghold_snapshot_file,
-                quaggin_stronghold_storage_file
-                )?;
-
-         //   let quaggin_security = QuagginSecurity{
-           //     stronghold: Arc::new(Mutex::new(quaggin_stronghold)),
-           //     authorization_configuration: authorization_configuration
-         //   };
-
-
-            
-
-            Ok(())
-        })
+       //  .setup(|app| {
+       //      let config = app.config();
+       //       let app_dir = app
+       //          .path()
+       //          .app_local_data_dir()
+       //          .expect("failed to start tauri at app dir");
+       //
+       //
+       //      let raw_authenication_configuration = app.config().plugins.0.get("authentication_configuration").unwrap();
+       //
+       //      let authentication_configuration: AuthenticationConfiguration = serde_json::from_value(raw_authenication_configuration.clone()).unwrap();
+       //
+       //      println!("Attemping key service...");
+       //
+       //      let test_keyring = StrongholdKeyRingEntry{
+       //          service_name: format!("test_name"),
+       //          service_user: format!("test_user")
+       //      };
+       //
+       //      let cat = test_keyring.get_or_create_stronghold_password()?;
+       //
+       //      let stronghold = Stronghold::default();
+       //      let quaggin_stronghold_client = stronghold.create_client(
+       //          "quaggin_security"
+       //         )?;
+       //
+       //      //let quaggin_snapshot = SnapshotPath::from_path(
+       //       //   app_dir.join(authentication_configuration.stronghold_snapshot_file)
+       //     //     );
+       //    //  let quaggin_key_provider = KeyProvider::with_passphrase_hashed(b"secret_quaggin_word", "meow")?;
+       //    //  stronghold.commit_with_keyprovider(
+       //    //      &quaggin_snapshot,
+       //    //      &quaggin_key_provider
+       //     //     )?;
+       //      //^actually write the local stronghold db file
+       //
+       //    //  stronghold.load_snapshot(app_dir.join(authentication_configuration.stronghold_snapshot_file));
+       //   //   let quaggin_stronghold_storage_file = app_dir.join(authentication_configuration.stronghold_storage_file);
+       //   //   let quaggin_stronghold = Stronghold::new(
+       //  //        quaggin_stronghold_snapshot_file,
+       // //         quaggin_stronghold_storage_file
+       // //         )?;
+       //
+       //   //   let quaggin_security = QuagginSecurity{
+       //     //     stronghold: Arc::new(Mutex::new(quaggin_stronghold)),
+       //     //     authorization_configuration: authorization_configuration
+       //   //   };
+       //
+       //
+       //
+       //
+       //      Ok(())
+       //  })
         //.manage(AppHandler::default())
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![search_gw2, test_oauth])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
+
+// fn create_stronghold_client(){
+//     let stronghold = Stronghold::default();
+//
+//     let client = stronghold.create_client(
+//         ClientPath::from("meow")
+//         );
+//
+//
+//
+// }
 
 pub struct AppHandler{
     pub QuagginSecurity: QuagginSecurity,
