@@ -161,12 +161,10 @@ pub struct Oauth2Configuration{
 }
 
 impl SecurityConfiguration{
-    fn get_keyring_entry_name(&self) -> &str{
-        &self.keyring_entry_name
+    fn get_oauth2_configuaration(&self) -> &Oauth2Configuration{
+        &self.Oauth2Configuration
     }
-    fn get_keyring_username(&self) -> &str{
-        &self.keyring_username
-    }
+
     pub fn return_or_create_keyring_entry(&self) -> Result<()>{
         
         println!("attempting wallet store....");
@@ -190,10 +188,24 @@ impl SecurityConfiguration{
         println!("This is the password!: {}", password);
 
         Ok(())
-
-
     }
-
+}
+impl Oauth2Configuration {
+    pub fn client_id(&self) -> &str {
+        &self.client_id
+    }
+    pub fn response_type(&self) -> &str {
+        &self.response_type
+    }
+    pub fn scope(&self) -> &str {
+        &self.scope
+    }
+    pub fn prompt(&self) -> &str {
+        &self.prompt
+    }
+    pub fn include_granted_scopes(&self) -> &str {
+        &self.include_granted_scopes
+    }
 }
 
 
