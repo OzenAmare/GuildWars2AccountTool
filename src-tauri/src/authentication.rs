@@ -125,8 +125,8 @@ pub struct QuagginSecurity{
 
  impl QuagginSecurity{
    pub async fn request_private_access(&self){
-       let dog = get_user_consent().await;
-       println!("This is the auth code: {:?}", dog);
+       //let dog = get_user_consent().await;
+       //println!("This is the auth code: {:?}", dog);
 
     }
    async fn flip_access_token(&self){
@@ -144,15 +144,15 @@ pub struct QuagginSecurity{
 pub struct SecurityConfiguration{
      keyring_entry_name: String,
      keyring_username: String,
-     redirect_routing_endpoint: String,
-     redirect_uri: String,
-     oauth2_link: String,
      stronghold_snapshot_file: String,
      stronghold_storage_file: String,
      Oauth2Configuration: Oauth2Configuration,
 }
 #[derive(Deserialize, Clone)]
-pub struct Oauth2Configuration{
+struct Oauth2Configuration{
+     oauth2_link: String,
+     redirect_routing_endpoint: String,
+     redirect_uri: String,
      client_id: String,
      response_type: String,
      scope: String,
@@ -161,32 +161,33 @@ pub struct Oauth2Configuration{
 }
 
 impl SecurityConfiguration{
-    fn get_oauth2_configuaration(&self) -> &Oauth2Configuration{
+    fn oauth2_configuaration(&self) -> &Oauth2Configuration{
         &self.Oauth2Configuration
     }
 
     pub fn return_or_create_keyring_entry(&self) -> Result<()>{
         
-        println!("attempting wallet store....");
-
-        let mut file = "home/ozen/Documents/test.txt";
-
-         keyring_core::set_default_store(sample::Store::new_with_backing(&file)?);
-       
-        let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_username)?; 
-        //otherwise go ahead and generate a new one using standard base64 
-        let mut bytes = [0u8; 32];
-        rand::rng().fill(&mut bytes);
-        let new_secret = STANDARD.encode(bytes);
-
-        println!("The new secret is {}", &new_secret);
-
-        //let dogs = keyring_entry.get_default_store()?;
-
-        keyring_entry.set_password(&new_secret)?;
-        let password = keyring_entry.get_password()?;
-        println!("This is the password!: {}", password);
-
+        // println!("attempting wallet store....");
+        //
+        // let mut file = "home/ozen/Documents/test.txt";
+        //
+        // // keyring_core::set_default_store(sample::Store::new_with_backing(&file)?);
+        // keyring_core::set_default_store();
+        //
+        // let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_username)?; 
+        // //otherwise go ahead and generate a new one using standard base64 
+        // let mut bytes = [0u8; 32];
+        // rand::rng().fill(&mut bytes);
+        // let new_secret = STANDARD.encode(bytes);
+        //
+        // println!("The new secret is {}", &new_secret);
+        //
+        // //let dogs = keyring_entry.get_default_store()?;
+        //
+        // keyring_entry.set_password(&new_secret)?;
+        // let password = keyring_entry.get_password()?;
+        // println!("This is the password!: {}", password);
+        //
         Ok(())
     }
 }
@@ -205,6 +206,68 @@ impl Oauth2Configuration {
     }
     pub fn include_granted_scopes(&self) -> &str {
         &self.include_granted_scopes
+    }
+    pub async fn get_user_consent(&self) -> &str{
+        let (tx, rx) = oneshot::channel::<String>();
+
+        let tx = std::sync::Arc::new(std::sync::Mutex::new(Some(tx)));
+
+        let mut auth_code = "";
+
+        let app = Router::new().route(
+            &self.redirect_routing_endpoint, 
+            get({
+                let tx = tx.clone();
+
+                move |Query(params): Query<OAuthCallback>|{
+                    let tx = tx.clone();
+
+                    async move {
+                        println!("recieved the auth code {}", params.code);
+
+                        if let Some(sender) = tx.lock().unwrap().take(){
+                            let auth_code = sender.send(params.code.clone());
+                        }
+           
+                    Html("You can close this window now :3")
+
+                    }
+                }
+            }),
+        );
+        //paramaterize the listener incase we ever want to change it 
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+            .await
+            .unwrap();
+
+        println!("axum is starting the server at localhost:3000...");
+
+     
+        tokio::spawn(async move {
+            if let Err(err) = axum::serve(listener, app).await {
+                eprintln!("Server error: {err}");
+            }   
+        });
+   
+        //we need to add a randomly generated string to use as a code challenge
+        //lets paramterize all of these seperately 
+        let request_url = Url::parse_with_params(&self.oauth2_link, 
+            &[
+                ("client_id", &self.client_id),
+                ("response_type", &self.response_type),
+                ("redirect_uri", &self.redirect_uri),
+                ("scope", &self.scope),
+                ("prompt", &self.prompt),
+                ("include_granted_scopes", &self.include_granted_scopes)
+                //,
+                //("code_verifier", "PKCE challenge"),
+            ]);
+    
+        let string_url = request_url.unwrap().to_string();
+        println!("{}", string_url);
+        open::that(string_url);
+       
+        &auth_code
     }
 }
 
