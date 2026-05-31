@@ -5,6 +5,10 @@ use axum::{
 };
 use open;
 use std::sync::Mutex;
+use keyring::{
+    use_native_store,
+    use_named_store
+};
 use std::thread;
 use tauri::Manager;
 use tiny_http::{Response, Server};
@@ -166,28 +170,39 @@ impl SecurityConfiguration{
     }
 
     pub fn return_or_create_keyring_entry(&self) -> Result<()>{
+
+        keyring::use_native_store(true);
         
-        // println!("attempting wallet store....");
-        //
-        // let mut file = "home/ozen/Documents/test.txt";
-        //
-        // // keyring_core::set_default_store(sample::Store::new_with_backing(&file)?);
-        // keyring_core::set_default_store();
-        //
-        // let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_username)?; 
-        // //otherwise go ahead and generate a new one using standard base64 
-        // let mut bytes = [0u8; 32];
-        // rand::rng().fill(&mut bytes);
-        // let new_secret = STANDARD.encode(bytes);
-        //
-        // println!("The new secret is {}", &new_secret);
-        //
-        // //let dogs = keyring_entry.get_default_store()?;
-        //
-        // keyring_entry.set_password(&new_secret)?;
-        // let password = keyring_entry.get_password()?;
-        // println!("This is the password!: {}", password);
-        //
+        println!("attempting wallet store....");
+
+        let attempt = keyring_core::get_default_store().unwrap();
+
+        //let cheese = attempt;
+        println!("This is they default_store {}", attempt.vendor());
+
+
+        let mut file = "home/ozen/Documents/test.txt";
+
+        // keyring_core::set_default_store(sample::Store::new_with_backing(&file)?);
+       // keyring_core::set_default_store();
+
+        println!("keyring entry name: {}", &self.keyring_entry_name);
+        println!("keyring user name {}", &self.keyring_username);
+
+        let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_username)?; 
+        //otherwise go ahead and generate a new one using standard base64 
+        let mut bytes = [0u8; 32];
+        rand::rng().fill(&mut bytes);
+        let new_secret = STANDARD.encode(bytes);
+
+        println!("The new secret is {}", &new_secret);
+
+        //let dogs = keyring_entry.get_default_store()?;
+
+        keyring_entry.set_password(&new_secret)?;
+        let password = keyring_entry.get_password()?;
+        println!("This is the password!: {}", password);
+
         Ok(())
     }
 }

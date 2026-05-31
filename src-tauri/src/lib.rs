@@ -175,6 +175,8 @@ pub fn run() {
                stronghold: Arc::new(tokio::sync::Mutex::new(Stronghold::default())),
                security_configuration: security_configuration.clone()
            };
+
+           security_configuration.return_or_create_keyring_entry();
            
 
 
