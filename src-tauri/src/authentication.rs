@@ -132,6 +132,18 @@ async fn get_user_consent() -> Result<String>{
 }
 
 
+
+fn get_arg_string(position: usize, default: &str) -> String {
+    std::env::args()
+        .nth(position)
+        .unwrap_or_else(|| String::from(default))
+}
+
+#[derive(Debug, Deserialize)]
+struct OAuthCallback{
+    code: String,
+}
+
 pub struct QuagginSecurity{
     pub stronghold: Arc<tokio::sync::Mutex<Stronghold>>,
     pub security_configuration: SecurityConfiguration
@@ -297,22 +309,6 @@ impl Oauth2Configuration {
     }
 }
 
-
-
-
-
-fn get_arg_string(position: usize, default: &str) -> String {
-    std::env::args()
-        .nth(position)
-        .unwrap_or_else(|| String::from(default))
-}
-
-#[derive(Debug, Deserialize)]
-struct OAuthCallback{
-    code: String,
-}
-
-
 pub struct ApiKey{
     key: SecretString, 
     duration: i32,
@@ -338,9 +334,9 @@ impl ApiKey{
     }
 }
 
-enum ApiKeyScope {
-    //this is the enum to keep track of endpoints that need proper authorization 
-    //Some are not includede in this enum, see other comments marked with N/A
+pub enum ApiKeyScope {
+    //this is the enum to keep track of endpoints that require authentication 
+    //Some are not included in this enum, see other comments marked with N/A
 
     // /account scopes
     Account(Vec<AccountScopes>),
@@ -359,42 +355,42 @@ enum ApiKeyScope {
     // /pvp scopes
     Pvp(Vec<PvpScopes>),
 
-    //N/A: Token info will be retievable from the ApiKey struct we give the
+    //N/A: Token info will be retrievable from the ApiKey struct we give the dev
 
 
 }
 
-enum AccountScopes{
-    account,
-    achievments,
-    bank,
-    build_storage,
-    daily_crafting,
-    dungeons,
-    dyes,
-    emotes,
-    finishers,
-    gliders,
-    inventory,
-    jade_bots,
-    legendary_armory,
-    luck,
-    mail,
-    mail_carriers,
-    map_chests,
-    masteries,
-    materials,
-    minis,
-    novelties,
-    outfits,
-    progression,
-    raids,
-    recipes,
-    skiffs,
-    titles,
-    wallet,
-    world_bosses,
-    wvw,
+pub enum AccountScopes{
+    Account,
+    Achievments,
+    Bank,
+    BuildStorage,
+    DailyCrafting,
+    Dungeons,
+    Dyes,
+    Emotes,
+    Finishers,
+    Gliders,
+    Inventory,
+    JadeBots,
+    LegendaryArmory,
+    Luck,
+    Mail,
+    MailCarriers,
+    MapChests,
+    Masteries,
+    Materials,
+    Minis,
+    Novelties,
+    Outfits,
+    Progression,
+    Raids,
+    Recipes,
+    Skiffs,
+    Titles,
+    Wallet,
+    WorldBosses,
+    WvW,
     WizardsVault(Vec<WizardsVaultScopes>),
     AccountPvp(Vec<AccountPvpScopes>),
     Mounts(Vec<MountScopes>),
@@ -404,38 +400,38 @@ enum AccountScopes{
 
 }
 
-enum WizardsVaultScopes{
+pub enum WizardsVaultScopes{
     Daily,
     Listings,
     Special,
     Weekly
 }
 
-enum AccountPvpScopes{
+pub enum AccountPvpScopes{
     Heroes
 }
 
-enum MountScopes{
+pub enum MountScopes{
     Skins,
     Types,
 }
 
-enum HomeScopes{
+pub enum HomeScopes{
     Cats,
     Nodes,
 }
 
-enum HomesteadScopes{
+pub enum HomesteadScopes{
     Decorations,
     Glyphs,
 
 }
 
-enum MasteryScopes{
+pub enum MasteryScopes{
     Points,
 }
 
-enum CharacterScopes{
+pub enum CharacterScopes{
     Characters,
     Backstory,
     BuildTabs(Vec<BuildTabsScopes>),
@@ -453,22 +449,22 @@ enum CharacterScopes{
     Specializations,
     Training
 }
-enum BuildTabsScopes{
+pub enum BuildTabsScopes{
     BuildTabs,
     Active
 }
 
-enum EquipmentTabsScopes{
+pub enum EquipmentTabsScopes{
     EquipmentTabs,
     Active
 }
 
-enum CommerceScopes{
+pub enum CommerceScopes{
     Delivery,
     Transactions
 }
 
-enum GuildScopes{
+pub enum GuildScopes{
     Guild,
     Log,
     Members,
@@ -482,7 +478,7 @@ enum GuildScopes{
 
 }
 
-enum PvpScopes{
+pub enum PvpScopes{
     Games,
     Standings,
     Stats
