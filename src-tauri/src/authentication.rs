@@ -22,9 +22,11 @@ use iota_stronghold::Stronghold;
 //use anyhow::Result as OtherResult;
 use std::path::PathBuf;
 use once_cell::sync::OnceCell;
+use secrecy::SecretString;
 //use secrets;
 use tauri::AppHandle;
 use getrandom;
+use anyhow; 
 use keyring_core::{
     mock,
     sample,
@@ -44,15 +46,24 @@ use base64::{
     Engine
 };
 use std::fs;
-//this is where this snippet came from
-//https://v2.tauri.app/plugin/stronghold/
-//
-//
-//
-//
 
 
 
+pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> ApiKey{
+
+    //this allows devs to get a key to access private user data
+
+    let new_key = ApiKey{
+        key: SecretString::new("some_key".into()),
+        duration: 60,
+        scope: desired_scope,
+        token_info: format!("get the token info from the api endpoint")
+    };
+
+    new_key
+
+
+}
 
 async fn get_user_consent() -> Result<String>{
 
@@ -288,50 +299,8 @@ impl Oauth2Configuration {
 
 
 
-//
-// pub struct StrongholdKeyRingEntry<authentication_configuration: AuthenticationConfiguration>{
-//      keyring_entry_name: String,
-//      keyring_user_name: String,
-// }
-//
-// impl StrongholdKeyRingEntry<authentication_configuration: AuthenticationConfiguration>{
-//     fn get_keyring_entry_name(&self, AuthenticationConfiguration: &AuthenticationConfiguration) -> &str{
-//         let self.keyring_entry_name = AuthenticationConfiguration.keyring_entry_name;
-//         &self.keyring_entry_name
-//     }
-//     fn get_keyring_user_name(AuthenticationConfiguration: AuthenticationConfiguration) -> &str{
-//         let self.keyring_user_name = AuthenticationConfiguration.keyring_user_name;
-//         &self.keyring_user_name
-//     }
-//  }
 
 
-// impl StrongholdKeyRingEntry{
-//     pub fn get_or_create_stronghold_password(&self) -> Result<()>{
-//
-//         println!("attempting wallet store....");
-//
-//         let mut file = "home/ozen/Documents/test.txt";
-//
-//          keyring_core::set_default_store(sample::Store::new_with_backing(&file)?);
-//
-//         let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_user_name)?; 
-//         //otherwise go ahead and generate a new one using standard base64 
-//         let mut bytes = [0u8; 32];
-//         rand::rng().fill(&mut bytes);
-//         let new_secret = STANDARD.encode(bytes);
-//
-//         println!("The new secret is {}", &new_secret);
-//
-//         //let dogs = keyring_entry.get_default_store()?;
-//
-//         keyring_entry.set_password(&new_secret)?;
-//         let password = keyring_entry.get_password()?;
-//         println!("This is the password!: {}", password);
-//
-//         Ok(())
-//     }
-// }
 fn get_arg_string(position: usize, default: &str) -> String {
     std::env::args()
         .nth(position)
@@ -343,3 +312,178 @@ struct OAuthCallback{
     code: String,
 }
 
+
+pub struct ApiKey{
+    key: SecretString, 
+    duration: i32,
+    scope: Vec<ApiKeyScope>,
+    //call the API to return information about the token
+    token_info: String
+}
+
+impl ApiKey{
+    pub fn Key(&self) -> &SecretString{
+        &self.key
+    }
+    pub fn Duration(&self) -> &i32{
+        &self.duration
+    }
+    pub fn Scope(&self) -> &Vec<ApiKeyScope>{
+        &self.scope
+    }
+
+    pub fn TokenInfo(&self) -> &str{
+       //return information from the /tokeninfo endpoint for the dev
+        &self.token_info
+    }
+}
+
+enum ApiKeyScope {
+    //this is the enum to keep track of endpoints that need proper authorization 
+    //Some are not includede in this enum, see other comments marked with N/A
+
+    // /account scopes
+    Account(Vec<AccountScopes>),
+
+    // /characters scopes
+    Characters(Vec<CharacterScopes>),
+
+    // /commerce scopes
+    Commerce(Vec<CommerceScopes>),
+
+    //N/A: we will not include CreateSubToken, we don't want devs trying to use that
+
+    // /guild scopes
+    Guild(Vec<GuildScopes>),
+
+    // /pvp scopes
+    Pvp(Vec<PvpScopes>),
+
+    //N/A: Token info will be retievable from the ApiKey struct we give the
+
+
+}
+
+enum AccountScopes{
+    account,
+    achievments,
+    bank,
+    build_storage,
+    daily_crafting,
+    dungeons,
+    dyes,
+    emotes,
+    finishers,
+    gliders,
+    inventory,
+    jade_bots,
+    legendary_armory,
+    luck,
+    mail,
+    mail_carriers,
+    map_chests,
+    masteries,
+    materials,
+    minis,
+    novelties,
+    outfits,
+    progression,
+    raids,
+    recipes,
+    skiffs,
+    titles,
+    wallet,
+    world_bosses,
+    wvw,
+    WizardsVault(Vec<WizardsVaultScopes>),
+    AccountPvp(Vec<AccountPvpScopes>),
+    Mounts(Vec<MountScopes>),
+    Home(Vec<HomeScopes>),
+    Homestead(Vec<HomesteadScopes>),
+    Mastery(Vec<MasteryScopes>),
+
+}
+
+enum WizardsVaultScopes{
+    Daily,
+    Listings,
+    Special,
+    Weekly
+}
+
+enum AccountPvpScopes{
+    Heroes
+}
+
+enum MountScopes{
+    Skins,
+    Types,
+}
+
+enum HomeScopes{
+    Cats,
+    Nodes,
+}
+
+enum HomesteadScopes{
+    Decorations,
+    Glyphs,
+
+}
+
+enum MasteryScopes{
+    Points,
+}
+
+enum CharacterScopes{
+    Characters,
+    Backstory,
+    BuildTabs(Vec<BuildTabsScopes>),
+    Core,
+    Crafting,
+    Dungons,
+    Equipment,
+    EquipmentTabs(Vec<EquipmentTabsScopes>),
+    HeroPoints,
+    Inventory,
+    Quests,
+    Recipes,
+    Sab,
+    Skills,
+    Specializations,
+    Training
+}
+enum BuildTabsScopes{
+    BuildTabs,
+    Active
+}
+
+enum EquipmentTabsScopes{
+    EquipmentTabs,
+    Active
+}
+
+enum CommerceScopes{
+    Delivery,
+    Transactions
+}
+
+enum GuildScopes{
+    Guild,
+    Log,
+    Members,
+    Ranks,
+    Storage,
+    Teams,
+    Treasury,
+    GuildSpecificUpgrades
+    // this one is guild/:id/upgrades in the API
+    // as opposed to /guild/upgrades which does not need authentication
+
+}
+
+enum PvpScopes{
+    Games,
+    Standings,
+    Stats
+}
