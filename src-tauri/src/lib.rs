@@ -3,26 +3,8 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 mod authentication;
-use authentication::{
-    QuagginSecurity, 
-    SecurityConfiguration
-};
-use open;
+use authentication::QuagginSecurity;
 use serde::Deserialize;
-use std::thread;
-use tokio;
-use tauri::{generate_context, Config};
-use tiny_http::{Response, Server};
-use url::Url;
-use std::sync::Mutex;
-use std::sync::Arc;
-use tauri::Manager;
-use tauri::AppHandle;
-use iota_stronghold::{
-    Stronghold,
-    SnapshotPath,
-    KeyProvider
-};
 #[derive(Deserialize)]
 struct Gw2Item {
     name: String,
@@ -39,20 +21,7 @@ struct Gw2Character {
 
 #[tauri::command]
 async fn test_oauth() -> Result<String, String> {
-
-     // let test_keyring = StrongholdKeyRingEntry{
-     //             service_name: format!("test_name"),
-     //             service_user: format!("test_user")
-     //         };
-     //
-     // let cat = test_keyring.get_or_create_stronghold_password()
-     //     .map_err(|e| e.to_string())?;
-     //
-    // put app:AppHandler back in laters 
-    //let handler = app.state::<AppHandler>();
-
-   // handler.QuagginSecurity.request_private_access().await;
-    Ok("meow".to_string())
+       Ok("meow".to_string())
 }
 
 #[tauri::command]
@@ -164,51 +133,13 @@ async fn search_character(character_name: String) -> Result<String, String> {
 pub fn run() {
 
     tauri::Builder::default()
-        .setup(|app| {
-
-           let config = app.config();
-
-           let raw_security_configuration =  app.config().plugins.0.get("security_configuration").unwrap(); 
-
-           let security_configuration: SecurityConfiguration = serde_json::from_value(raw_security_configuration.clone()).unwrap();
-           let quaggin_security = QuagginSecurity{
-               stronghold: Arc::new(tokio::sync::Mutex::new(Stronghold::default())),
-               security_configuration: security_configuration.clone()
-           };
-
-           security_configuration.return_or_create_keyring_entry();
-           
-
-
-          let app_handler = AppHandler{
-               QuagginSecurity: quaggin_security
-           };
-
-          app.manage(app_handler);
-           
-
-            Ok(())
-        })
         .plugin(tauri_plugin_opener::init())
         .invoke_handler(tauri::generate_handler![search_gw2, test_oauth])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
 
-// fn create_stronghold_client(){
-//     let stronghold = Stronghold::default();
-//
-//     let client = stronghold.create_client(
-//         ClientPath::from("meow")
-//         );
-//
-//
-//
-// }
 
-pub struct AppHandler{
-    pub QuagginSecurity: QuagginSecurity,
-}
 
 
 

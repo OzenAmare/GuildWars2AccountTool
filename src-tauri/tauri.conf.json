@@ -7,8 +7,6 @@
     "security_configuration":{
       "keyring_entry_name": "QUAGGIN_STRONGHOLD_PASSWORD",
       "keyring_username": "quaggin",
-      "stronghold_snapshot_file": "quaggin_security_snapshot.snapshot",
-      "stronghold_storage_file": "quaggin_security_storage.dat",    
       "Oauth2Configuration": {
         "oauth2_link": "https://gw2.me/oaut2/authorize?",
         "redirect_routing_endpoint": "/callback",

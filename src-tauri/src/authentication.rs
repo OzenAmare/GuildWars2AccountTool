@@ -1,53 +1,32 @@
 use axum::{
     routing::get, 
     Router,
-    serve::Serve
+    extract::Query,
+    response::Html
 };
-use open;
-use std::sync::Mutex;
-use keyring::{
-    use_native_store,
-    use_named_store
+use keyring::use_native_store;
+use std::{
+    thread,
+    fs,
+    sync::{ 
+        Arc,
+        Mutex
+    },
+    path::PathBuf
 };
-use std::thread;
-use tauri::Manager;
-use tiny_http::{Response, Server};
-use url::Url;
-use tokio;
-use axum::extract::Query;
-use std::sync::Arc;
-use axum::response::Html;
-use serde::Deserialize;
-use iota_stronghold::Stronghold;
-//use anyhow::Result as OtherResult;
-use std::path::PathBuf;
-use once_cell::sync::OnceCell;
-use secrecy::SecretString;
-//use secrets;
-use tauri::AppHandle;
-use getrandom;
-use anyhow; 
 use keyring_core::{
-    mock,
-    sample,
     Entry,
     Result
 };
-
-//use keyring;
-use keyring;
-use rand::RngExt;
-// use rand::{
-//     thread_rng,
-//     Rng
-// };
 use base64::{
     engine::general_purpose::STANDARD,
     Engine
 };
-use std::fs;
-
-
+use rand::RngExt;
+use open::that;
+use url::Url;
+use serde::Deserialize;
+use secrecy::SecretString;
 
 pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> ApiKey{
 
@@ -61,77 +40,7 @@ pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> Ap
     };
 
     new_key
-
-
 }
-
-async fn get_user_consent() -> Result<String>{
-
-    //this function starts a webserver and returns their initial key for authorized access
-    let (tx, rx) = oneshot::channel::<String>();
-
-    let tx = std::sync::Arc::new(std::sync::Mutex::new(Some(tx)));
-
-    let mut auth_code = "";
-
-        let app = Router::new().route(
-        "/callback", 
-        get({
-            let tx = tx.clone();
-
-            move |Query(params): Query<OAuthCallback>|{
-                let tx = tx.clone();
-
-                async move {
-                    println!("recieved the auth code {}", params.code);
-
-                    if let Some(sender) = tx.lock().unwrap().take(){
-                        let auth_code = sender.send(params.code.clone());
-                    }
-           
-                 Html("You can close this window now :3")
-
-               }
-            }
-        }),
-        );
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
-        .await
-        .unwrap();
-
-     println!("axum is starting the server at localhost:3000...");
-
-     
-    tokio::spawn(async move {
-       if let Err(err) = axum::serve(listener, app).await {
-           eprintln!("Server error: {err}");
-       }   
-    });
-   
-    //we need to add a randomly generated string to use as a code challenge
-    //lets paramterize all of these seperately 
-    let oauth2_link = "https://gw2.me/oauth2/authorize?";
-    let request_url = Url::parse_with_params(oauth2_link, 
-        &[
-        ("client_id", "b185490f-b41b-40bc-9b1d-a5d7eb22ac68"),
-        ("response_type", "code"),
-        ("redirect_uri", "http://127.0.0.1:3000/callback"),
-        ("scope", "identify"),
-        ("prompt", "consent"),
-        ("include_granted_scopes", "true")
-        //,
-        //("code_verifier", "PKCE challenge"),
-        ]);
-    
-    let string_url = request_url.unwrap().to_string();
-    println!("{}", string_url);
-    open::that(string_url);
-
-       
-    Ok(auth_code.to_string())
-}
-
-
 
 fn get_arg_string(position: usize, default: &str) -> String {
     std::env::args()
@@ -144,35 +53,10 @@ struct OAuthCallback{
     code: String,
 }
 
-pub struct QuagginSecurity{
-    pub stronghold: Arc<tokio::sync::Mutex<Stronghold>>,
-    pub security_configuration: SecurityConfiguration
-    
-}
-
- impl QuagginSecurity{
-   pub async fn request_private_access(&self){
-       //let dog = get_user_consent().await;
-       //println!("This is the auth code: {:?}", dog);
-
-    }
-   async fn flip_access_token(&self){
-       //this is where we'll get the proper access token and secure it in our framework
-       //we need to hit this endpoint-> https://gw2.me/api/token
-       //the following parameters are needed:
-       //grant_type| "refresh_token" | Literally what we're asking for 
-       //refresh_token| String |the refresh token itself 
-       //client_id| String |our client id 
-       //client_secret| String |our client secret
-   }
-}
-
 #[derive(Deserialize, Clone)]
-pub struct SecurityConfiguration{
+pub struct QuagginSecurity{
      keyring_entry_name: String,
      keyring_username: String,
-     stronghold_snapshot_file: String,
-     stronghold_storage_file: String,
      Oauth2Configuration: Oauth2Configuration,
 }
 #[derive(Deserialize, Clone)]
@@ -187,27 +71,20 @@ struct Oauth2Configuration{
      include_granted_scopes: String,
 }
 
-impl SecurityConfiguration{
+impl QuagginSecurity{
     fn oauth2_configuaration(&self) -> &Oauth2Configuration{
         &self.Oauth2Configuration
     }
 
-    pub fn return_or_create_keyring_entry(&self) -> Result<()>{
+    pub fn return_or_create_keyring_entry(&self) -> Result<String>{
 
-        keyring::use_native_store(true);
+        use_native_store(true);
         
         println!("attempting wallet store....");
 
         let attempt = keyring_core::get_default_store().unwrap();
 
-        //let cheese = attempt;
         println!("This is they default_store {}", attempt.vendor());
-
-
-        let mut file = "home/ozen/Documents/test.txt";
-
-        // keyring_core::set_default_store(sample::Store::new_with_backing(&file)?);
-       // keyring_core::set_default_store();
 
         println!("keyring entry name: {}", &self.keyring_entry_name);
         println!("keyring user name {}", &self.keyring_username);
@@ -217,16 +94,9 @@ impl SecurityConfiguration{
         let mut bytes = [0u8; 32];
         rand::rng().fill(&mut bytes);
         let new_secret = STANDARD.encode(bytes);
-
-        println!("The new secret is {}", &new_secret);
-
-        //let dogs = keyring_entry.get_default_store()?;
-
         keyring_entry.set_password(&new_secret)?;
         let password = keyring_entry.get_password()?;
-        println!("This is the password!: {}", password);
-
-        Ok(())
+        Ok(password)
     }
 }
 impl Oauth2Configuration {
@@ -246,11 +116,11 @@ impl Oauth2Configuration {
         &self.include_granted_scopes
     }
     pub async fn get_user_consent(&self) -> &str{
-        let (tx, rx) = oneshot::channel::<String>();
+        let (tx, _rx) = oneshot::channel::<String>();
 
         let tx = std::sync::Arc::new(std::sync::Mutex::new(Some(tx)));
 
-        let mut auth_code = "";
+        let auth_code = "";
 
         let app = Router::new().route(
             &self.redirect_routing_endpoint, 
@@ -280,13 +150,12 @@ impl Oauth2Configuration {
 
         println!("axum is starting the server at localhost:3000...");
 
-     
         tokio::spawn(async move {
             if let Err(err) = axum::serve(listener, app).await {
                 eprintln!("Server error: {err}");
-            }   
+            }
         });
-   
+ 
         //we need to add a randomly generated string to use as a code challenge
         //lets paramterize all of these seperately 
         let request_url = Url::parse_with_params(&self.oauth2_link, 
@@ -300,11 +169,10 @@ impl Oauth2Configuration {
                 //,
                 //("code_verifier", "PKCE challenge"),
             ]);
-    
+ 
         let string_url = request_url.unwrap().to_string();
         println!("{}", string_url);
-        open::that(string_url);
-       
+        that(string_url);
         &auth_code
     }
 }
@@ -356,7 +224,6 @@ pub enum ApiKeyScope {
     Pvp(Vec<PvpScopes>),
 
     //N/A: Token info will be retrievable from the ApiKey struct we give the dev
-
 
 }
 
