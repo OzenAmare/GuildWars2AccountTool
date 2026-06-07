@@ -3,7 +3,7 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 mod authentication;
-use authentication::QuagginSecurity;
+use authentication::QuagginKeyringSecurity;
 use serde::Deserialize;
 #[derive(Deserialize)]
 struct Gw2Item {

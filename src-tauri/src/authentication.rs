@@ -26,7 +26,10 @@ use rand::RngExt;
 use open::that;
 use url::Url;
 use serde::Deserialize;
-use secrecy::SecretString;
+use secrecy::{
+    SecretString,
+    ExposeSecret
+};
 
 pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> ApiKey{
 
@@ -42,6 +45,13 @@ pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> Ap
     new_key
 }
 
+fn get_or_set_oauth_password(){
+let raw_config = env!("QuagginKeyringSecurity");
+let test_secret: QuagginKeyringSecurity = serde::from_str(raw_config).expect("failure"); 
+
+}
+
+
 fn get_arg_string(position: usize, default: &str) -> String {
     std::env::args()
         .nth(position)
@@ -54,7 +64,7 @@ struct OAuthCallback{
 }
 
 #[derive(Deserialize, Clone)]
-pub struct QuagginSecurity{
+pub struct QuagginKeyringSecurity{
      keyring_entry_name: String,
      keyring_username: String,
      Oauth2Configuration: Oauth2Configuration,
@@ -71,32 +81,39 @@ struct Oauth2Configuration{
      include_granted_scopes: String,
 }
 
-impl QuagginSecurity{
+impl QuagginKeyringSecurity{
     fn oauth2_configuaration(&self) -> &Oauth2Configuration{
         &self.Oauth2Configuration
     }
 
-    pub fn return_or_create_keyring_entry(&self) -> Result<String>{
+    fn create_keyring_entry(&self, secret_to_store: SecretString) -> Result<Entry>{
 
+        //set the OS credential store based on the operating system
         use_native_store(true);
-        
-        println!("attempting wallet store....");
-
-        let attempt = keyring_core::get_default_store().unwrap();
-
-        println!("This is they default_store {}", attempt.vendor());
 
         println!("keyring entry name: {}", &self.keyring_entry_name);
+
         println!("keyring user name {}", &self.keyring_username);
 
+        //prepare the new keyring entry in the system
         let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_username)?; 
-        //otherwise go ahead and generate a new one using standard base64 
+
+        //create the password
         let mut bytes = [0u8; 32];
         rand::rng().fill(&mut bytes);
-        let new_secret = STANDARD.encode(bytes);
-        keyring_entry.set_password(&new_secret)?;
-        let password = keyring_entry.get_password()?;
-        Ok(password)
+        let new_password = STANDARD.encode(&bytes);
+
+        //set the secret
+        keyring_entry.set_password(&new_password)?;
+        keyring_entry.set_secret(&secret_to_store.expose_secret().as_bytes());
+
+
+        Ok(keyring_entry)
+    }
+
+    fn check_keyring_entry(&self) -> Result<bool>{
+
+        Ok(true)
     }
 }
 impl Oauth2Configuration {
