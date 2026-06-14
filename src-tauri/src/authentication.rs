@@ -31,6 +31,7 @@ use secrecy::{
     ExposeSecret
 };
 
+const test: &str = env!("API_TEST");
 pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> ApiKey{
 
     //this allows devs to get a key to access private user data
@@ -46,7 +47,6 @@ pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> Ap
 }
 
 fn get_or_set_oauth_password(){
-let raw_config = env!("QuagginKeyringSecurity");
 let test_secret: QuagginKeyringSecurity = serde::from_str(raw_config).expect("failure"); 
 
 }
