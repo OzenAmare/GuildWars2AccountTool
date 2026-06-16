@@ -3,7 +3,6 @@
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 
 mod authentication;
-use authentication::QuagginKeyringSecurity;
 use serde::Deserialize;
 #[derive(Deserialize)]
 struct Gw2Item {
@@ -21,6 +20,9 @@ struct Gw2Character {
 
 #[tauri::command]
 async fn test_oauth() -> Result<String, String> {
+    let test = std::env::var("API_TEST")
+    .expect("API_TEST not set");
+    println!("this is the test {}", test);
        Ok("meow".to_string())
 }
 
@@ -131,6 +133,8 @@ async fn search_character(character_name: String) -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+
+    authentication::load_security_configuration();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())

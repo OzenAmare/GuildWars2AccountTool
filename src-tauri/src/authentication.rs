@@ -30,12 +30,14 @@ use secrecy::{
     SecretString,
     ExposeSecret
 };
-
-const test: &str = env!("API_TEST");
+//use figment::{Figment, providers::Env};
+//const test: &str = env!("API_TEST");
 pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> ApiKey{
 
     //this allows devs to get a key to access private user data
-
+let test = std::env::var("API_TEST")
+    .expect("API_TEST not set");
+    println!("this is the variable {}", test);
     let new_key = ApiKey{
         key: SecretString::new("some_key".into()),
         duration: 60,
@@ -46,9 +48,8 @@ pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> Ap
     new_key
 }
 
-fn get_or_set_oauth_password(){
-let test_secret: QuagginKeyringSecurity = serde::from_str(raw_config).expect("failure"); 
-
+pub fn load_security_configuration() {
+    QuagginKeyringSecurity::load().expect("could not load security");
 }
 
 
@@ -64,10 +65,10 @@ struct OAuthCallback{
 }
 
 #[derive(Deserialize, Clone)]
-pub struct QuagginKeyringSecurity{
-     keyring_entry_name: String,
-     keyring_username: String,
-     Oauth2Configuration: Oauth2Configuration,
+struct QuagginKeyringSecurity{
+    keyring_entry_name: String,
+    keyring_username: String,
+    Oauth2Configuration: Oauth2Configuration,
 }
 #[derive(Deserialize, Clone)]
 struct Oauth2Configuration{
@@ -78,25 +79,44 @@ struct Oauth2Configuration{
      response_type: String,
      scope: String,
      prompt: String,
-     include_granted_scopes: String,
+     include_granted_scopes: bool,
 }
 
+
 impl QuagginKeyringSecurity{
+    fn load() -> Result<Self>{
+        let quaggin_security_config = std::fs::read_to_string("configuration/quaggin_keyring_security.toml").expect("could not read security.toml");
+        let quaggin_security_struct: QuagginKeyringSecurity = toml::from_str(&quaggin_security_config).expect("could not read security.toml");
+        Ok(Self{
+            keyring_entry_name: quaggin_security_struct.keyring_entry_name,
+            keyring_username: quaggin_security_struct.keyring_username,
+            Oauth2Configuration: quaggin_security_struct.Oauth2Configuration
+        })
+    }
+    fn keyring_entry_name(&self) -> &str{
+        println!("This is the entry name {}", self.keyring_entry_name);
+        &self.keyring_entry_name
+    }
+    fn keyring_username(&self) -> &str{
+        &self.keyring_username
+    }
+
     fn oauth2_configuaration(&self) -> &Oauth2Configuration{
         &self.Oauth2Configuration
     }
+
 
     fn create_keyring_entry(&self, secret_to_store: SecretString) -> Result<Entry>{
 
         //set the OS credential store based on the operating system
         use_native_store(true);
 
-        println!("keyring entry name: {}", &self.keyring_entry_name);
+        println!("keyring entry name: {}", self.keyring_entry_name());
 
-        println!("keyring user name {}", &self.keyring_username);
+        println!("keyring user name {}", self.keyring_username());
 
         //prepare the new keyring entry in the system
-        let keyring_entry = Entry::new(&self.keyring_entry_name, &self.keyring_username)?; 
+        let keyring_entry = Entry::new(self.keyring_entry_name(), self.keyring_username())?; 
 
         //create the password
         let mut bytes = [0u8; 32];
@@ -112,7 +132,6 @@ impl QuagginKeyringSecurity{
     }
 
     fn check_keyring_entry(&self) -> Result<bool>{
-
         Ok(true)
     }
 }
@@ -129,7 +148,7 @@ impl Oauth2Configuration {
     pub fn prompt(&self) -> &str {
         &self.prompt
     }
-    pub fn include_granted_scopes(&self) -> &str {
+    pub fn include_granted_scopes(&self) -> &bool {
         &self.include_granted_scopes
     }
     pub async fn get_user_consent(&self) -> &str{
@@ -182,7 +201,7 @@ impl Oauth2Configuration {
                 ("redirect_uri", &self.redirect_uri),
                 ("scope", &self.scope),
                 ("prompt", &self.prompt),
-                ("include_granted_scopes", &self.include_granted_scopes)
+                ("include_granted_scopes", &self.include_granted_scopes.to_string())
                 //,
                 //("code_verifier", "PKCE challenge"),
             ]);

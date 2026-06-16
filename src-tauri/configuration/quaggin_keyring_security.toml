@@ -1,0 +1,15 @@
+
+#local credential store information
+keyring_entry_name = "QUAGGIN_REFRESH_TOKEN"
+keyring_username = "QUAGGIN_SECURITY"
+
+[Oauth2Configuration]
+oauth2_link = "https://gw2.me/oauth2/authorize"
+redirect_routing_endpoint = "/callback"
+redirect_uri="http%3A%2F%2F127.0.0.1"
+client_id="b185490f-b41b-40bc-9b1d-a5d7eb22ac68"
+response_type="code"
+scope="identify"
+prompt="consent"
+include_granted_scopes=true
+
