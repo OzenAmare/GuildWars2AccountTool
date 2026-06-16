@@ -205,7 +205,7 @@ struct AuthoizationTokenConfiguration{
 }
 impl AuthoizationTokenConfiguration{
        async fn get_authoization_token(&self) -> Result<SecretString>{
-        let (tx, rx) = oneshot::channel::<String>();
+            let (tx, rx) = oneshot::channel::<String>();
         let tx = std::sync::Arc::new(std::sync::Mutex::new(Some(tx)));
         let auth_code = "";
         let app = Router::new().route(
@@ -264,9 +264,11 @@ impl AuthoizationTokenConfiguration{
         println!("{}", string_url);
         that(string_url);
         let secret_auth_code = SecretString::new(String::from(auth_code).into_boxed_str());
+        println!("this is the auth code: {}", auth_code);
         auth_code.to_owned().zeroize();
         Ok(secret_auth_code)
-    }
+
+           }
 
     async fn get_refresh_token() -> Result<SecretString>{
 
