@@ -27,9 +27,12 @@ use open::that;
 use url::Url;
 use serde::Deserialize;
 use secrecy::{
+    SecretBox,
     SecretString,
     ExposeSecret
 };
+use std::sync::OnceLock;
+
 //use figment::{Figment, providers::Env};
 //const test: &str = env!("API_TEST");
 pub async fn request_private_data_api_key(desired_scope: Vec<ApiKeyScope>) -> ApiKey{
@@ -48,8 +51,27 @@ let test = std::env::var("API_TEST")
     new_key
 }
 
+static QUAGGIN_IS_HERE: OnceLock<bool> = OnceLock::new();
+
 pub fn load_security_configuration() {
-    QuagginKeyringSecurity::load().expect("could not load security");
+
+    QUAGGIN_IS_HERE.get_or_init(|| {
+        //load our security information
+        let loaded_security = QuagginKeyringSecurity::load().expect("could not load security");
+        //let password: Box<str> = "cheesecake".to_string().into_boxed_str();
+        // let secret_box = SecretString::new(password);
+        //banana.create_keyring_entry(secret_box).expect("could not make entry");
+        let secret_set = loaded_security.check_keyring_entry().expect("keyring failed");
+
+        if secret_set{
+            println!("the secret has been set, quaggin!");
+        }else{
+            println!("Oh no quaggin! The secret hasn't been set!");
+            loaded_security.create_keyring_entry();
+        }
+
+        true
+    });
 }
 
 
@@ -85,8 +107,14 @@ struct Oauth2Configuration{
 
 impl QuagginKeyringSecurity{
     fn load() -> Result<Self>{
+
+        //use whatever is the native OS credential store 
+        use_native_store(true);
+
+        //read the security configuration 
         let quaggin_security_config = std::fs::read_to_string("configuration/quaggin_keyring_security.toml").expect("could not read security.toml");
-        let quaggin_security_struct: QuagginKeyringSecurity = toml::from_str(&quaggin_security_config).expect("could not read security.toml");
+        let quaggin_security_struct: QuagginKeyringSecurity = toml::from_str(&quaggin_security_config).expect("could not parse security.toml");
+        
         Ok(Self{
             keyring_entry_name: quaggin_security_struct.keyring_entry_name,
             keyring_username: quaggin_security_struct.keyring_username,
@@ -106,10 +134,10 @@ impl QuagginKeyringSecurity{
     }
 
 
-    fn create_keyring_entry(&self, secret_to_store: SecretString) -> Result<Entry>{
+    fn create_keyring_entry(&self) -> Result<Entry>{
 
         //set the OS credential store based on the operating system
-        use_native_store(true);
+        //use_native_store(true);
 
         println!("keyring entry name: {}", self.keyring_entry_name());
 
@@ -125,14 +153,26 @@ impl QuagginKeyringSecurity{
 
         //set the secret
         keyring_entry.set_password(&new_password)?;
-        keyring_entry.set_secret(&secret_to_store.expose_secret().as_bytes());
-
 
         Ok(keyring_entry)
     }
 
     fn check_keyring_entry(&self) -> Result<bool>{
-        Ok(true)
+        let keyring_entry = Entry::new(self.keyring_entry_name(), self.keyring_username())?;
+
+        //let boxed_secret = Box::new(keyring_entry.get_secret().expect("no"));
+        // let secret = SecretBox::new(
+        //     Box::new(keyring_entry.get_secret().expect("no"))
+        //     );
+
+        let secret_exists = match keyring_entry.get_secret(){
+            Ok(secret) => !secret.is_empty(),
+            Err(_) => false,
+        };
+
+       // let secret_string_existance = secret.expose_secret().is_empty();
+
+        Ok(secret_exists)
     }
 }
 impl Oauth2Configuration {
