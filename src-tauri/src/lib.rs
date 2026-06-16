@@ -20,9 +20,11 @@ struct Gw2Character {
 
 #[tauri::command]
 async fn test_oauth() -> Result<String, String> {
-    let test = std::env::var("API_TEST")
-    .expect("API_TEST not set");
-    println!("this is the test {}", test);
+
+    authentication::request_user_data().await;
+    // let test = std::env::var("API_TEST")
+    // .expect("API_TEST not set");
+    // println!("this is the test {}", test);
        Ok("meow".to_string())
 }
 
