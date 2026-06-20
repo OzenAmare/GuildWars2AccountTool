@@ -22,7 +22,11 @@ use base64::{
     engine::general_purpose::STANDARD,
     Engine
 };
-use rand::RngExt;
+use rand::{
+    RngExt,
+    //distributions::Alphanumeric,
+    Rng 
+};
 use open::that;
 use url::Url;
 use serde::Deserialize;
@@ -205,46 +209,56 @@ struct AuthoizationTokenConfiguration{
 }
 impl AuthoizationTokenConfiguration{
        async fn get_authoization_token(&self) -> Result<SecretString>{
-            let (tx, rx) = oneshot::channel::<String>();
-        let tx = std::sync::Arc::new(std::sync::Mutex::new(Some(tx)));
-        let auth_code = "";
-        let app = Router::new().route(
-            &self.redirect_routing_endpoint, 
-            get({
-                let tx = tx.clone();
 
-                move |Query(params): Query<OAuthCallback>|{
-                    let tx = tx.clone();
+           //let's start implementing PKCE flow. 
+           //
 
-                    async move {
-                        if let Some(sender) = tx.lock().unwrap().take(){
-                            let auth_code = sender.send(params.code.clone());
-                            //make a post request to get an access token
-
-
-                            //let dogs = SecretString::new(auth_code.into_boxed_str());
-
-                            //let access_token = SecretBoxinit_with(dogs);
-                        }
-           
-                    Html("You can close this window now :3")
-
-                    }
-                }
-            }),
-        );
+           //Generate the random code verifier. 
+            let hashed_pkce_code_challenge = SecretBox::new(
+                Box::new(    
+                    rand::rng().random::<u128>()
+               )
+            ); 
+        // let (tx, rx) = oneshot::channel::<String>();
+        // let tx = std::sync::Arc::new(std::sync::Mutex::new(Some(tx)));
+        // let auth_code = "";
+        // let app = Router::new().route(
+        //     &self.redirect_routing_endpoint, 
+        //     get({
+        //         let tx = tx.clone();
+        //
+        //         move |Query(params): Query<OAuthCallback>|{
+        //             let tx = tx.clone();
+        //
+        //             async move {
+        //                 if let Some(sender) = tx.lock().unwrap().take(){
+        //                     let auth_code = sender.send(params.code.clone());
+        //                     //make a post request to get an access token
+        //
+        //
+        //                     //let dogs = SecretString::new(auth_code.into_boxed_str());
+        //
+        //                     //let access_token = SecretBoxinit_with(dogs);
+        //                 }
+        //
+        //             Html("You can close this window now :3")
+        //
+        //             }
+        //         }
+        //     }),
+        // );
         //paramaterize the listener incase we ever want to change it 
-        let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
-            .await
-            .unwrap();
-
-        println!("axum is starting the server at localhost:3000...");
-
-        tokio::spawn(async move {
-            if let Err(err) = axum::serve(listener, app).await {
-                eprintln!("Server error: {err}");
-            }
-        });
+        // let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        //     .await
+        //     .unwrap();
+        //
+        // println!("axum is starting the server at localhost:3000...");
+        //
+        // tokio::spawn(async move {
+        //     if let Err(err) = axum::serve(listener, app).await {
+        //         eprintln!("Server error: {err}");
+        //     }
+        // });
  
         //we need to add a randomly generated string to use as a code challenge
         //lets paramterize all of these seperately 
@@ -256,16 +270,16 @@ impl AuthoizationTokenConfiguration{
                 ("scope", &self.scope),
                 ("prompt", &self.prompt),
                 ("include_granted_scopes", &self.include_granted_scopes.to_string())
-                //,
-                //("code_verifier", "PKCE challenge"),
+                ("code_verifier", hashed_pkce_code_challenge.expose_secret()),
+                ("code_challenge_method", "S256")
             ]);
  
-        let string_url = request_url.unwrap().to_string();
-        println!("{}", string_url);
-        that(string_url);
-        let secret_auth_code = SecretString::new(String::from(auth_code).into_boxed_str());
-        println!("this is the auth code: {}", auth_code);
-        auth_code.to_owned().zeroize();
+        //let string_url = request_url.unwrap().to_string();
+        //println!("{}", string_url);
+        //that(string_url);
+        //let secret_auth_code = SecretString::new(String::from(auth_code).into_boxed_str());
+       // println!("this is the auth code: {}", auth_code);
+       // auth_code.to_owned().zeroize();
         Ok(secret_auth_code)
 
            }
