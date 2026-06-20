@@ -27,6 +27,10 @@ use rand::{
     //distributions::Alphanumeric,
     Rng 
 };
+use sha2::{
+    Sha256,
+    Digest
+};
 use open::that;
 use url::Url;
 use serde::Deserialize;
@@ -213,53 +217,25 @@ impl AuthoizationTokenConfiguration{
            //let's start implementing PKCE flow. 
            //
 
+           //let hasher = Sha256::new();
+
+           let random_u128 = rand::rng().random::<u128>();
+           let pkce_code_verifier = random_u128.to_string();
+           let random_u128_hash = Sha256::digest(pkce_code_verifier);
+
+           //let random_u128_hash_string = String::from(random_u128_hash);
            //Generate the random code verifier. 
             let hashed_pkce_code_challenge = SecretBox::new(
                 Box::new(    
-                    rand::rng().random::<u128>()
+                    //let hasher = Sha256::new();
+                    //Sha256::digest(rand::rng().random::<u128>())
+                    random_u128_hash.to_string()
+                    //rand::rng().random::<u128>()
+                    //
+                    //random_u128_hash
                )
             ); 
-        // let (tx, rx) = oneshot::channel::<String>();
-        // let tx = std::sync::Arc::new(std::sync::Mutex::new(Some(tx)));
-        // let auth_code = "";
-        // let app = Router::new().route(
-        //     &self.redirect_routing_endpoint, 
-        //     get({
-        //         let tx = tx.clone();
-        //
-        //         move |Query(params): Query<OAuthCallback>|{
-        //             let tx = tx.clone();
-        //
-        //             async move {
-        //                 if let Some(sender) = tx.lock().unwrap().take(){
-        //                     let auth_code = sender.send(params.code.clone());
-        //                     //make a post request to get an access token
-        //
-        //
-        //                     //let dogs = SecretString::new(auth_code.into_boxed_str());
-        //
-        //                     //let access_token = SecretBoxinit_with(dogs);
-        //                 }
-        //
-        //             Html("You can close this window now :3")
-        //
-        //             }
-        //         }
-        //     }),
-        // );
-        //paramaterize the listener incase we ever want to change it 
-        // let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
-        //     .await
-        //     .unwrap();
-        //
-        // println!("axum is starting the server at localhost:3000...");
-        //
-        // tokio::spawn(async move {
-        //     if let Err(err) = axum::serve(listener, app).await {
-        //         eprintln!("Server error: {err}");
-        //     }
-        // });
- 
+         
         //we need to add a randomly generated string to use as a code challenge
         //lets paramterize all of these seperately 
         let request_url = Url::parse_with_params(&self.oauth2_link, 
